@@ -6,13 +6,13 @@
 
 namespace imua
 {
-  namespace generic
+  namespace snowboard
   {
 
     /**
      *
      */
-    bool detectJumps(const float durationMin, std::vector<Detection> & detection);
+    bool detectJumps(std::vector<Detection> & detection);
 
   }
 }
