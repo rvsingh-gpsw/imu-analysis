@@ -4,10 +4,21 @@ namespace imua
 {
 
   Detection::Detection():
-  startTime(0.f),
-  endTime(0.f),
-  climaxTime(0.f),
-  climaxValue(0.f),
+  start(0.f),
+  end(0.f),
+  climax(0.f),
+  value(0.f),
   description("Default"){}
-  
+
+
+  Detection::Detection(const float startTime,
+                       const float endTime,
+                       const std::string description):
+  start(startTime),
+  end(endTime),
+  climax(startTime),
+  value(0.f),
+  description(description){}
+
+
 }

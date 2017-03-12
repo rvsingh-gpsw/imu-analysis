@@ -1,11 +1,8 @@
 # Project name
 project(IMUA)
 
+# CMake minimum version
 cmake_minimum_required (VERSION 2.8.11)
-
-
-# Lib name
-set(LIBNAME IMUAnalysis)
 
 # Where to look for headers
 include_directories(include)
@@ -16,6 +13,7 @@ set(SRC src/generic.cpp
         src/types.cpp)
 
 # Create a library
+set(LIBNAME IMUAnalysis)
 add_library(${LIBNAME} STATIC ${SRC})
 
 # Indicate where to install the library
@@ -27,5 +25,6 @@ add_library(${LIBNAME} STATIC ${SRC})
 #)
 
 # Create an executable using the created library
-add_executable(hello main.cpp)
-target_link_libraries(hello ${LIBNAME})
+set(EXENAME detector)
+add_executable(${EXENAME} main.cpp gpmf_parser.c)
+target_link_libraries(${EXENAME} ${LIBNAME})

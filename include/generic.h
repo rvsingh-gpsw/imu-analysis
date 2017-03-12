@@ -12,7 +12,8 @@ namespace imua
     /**
      *
      */
-    bool detectJumps(const float durationMin, std::vector<Detection> & detection);
+    bool detectJumps(std::vector<Detection> & detections,
+                     const float durationMin=0.5f);
 
   }
 }

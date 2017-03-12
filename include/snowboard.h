@@ -12,7 +12,12 @@ namespace imua
     /**
      *
      */
-    bool detectJumps(std::vector<Detection> & detection);
+    bool detectJumps(std::vector<Detection> & detections);
+
+    /**
+     *
+     */
+    bool detect360(std::vector<Detection> & detections);
 
   }
 }

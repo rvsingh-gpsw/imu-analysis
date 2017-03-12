@@ -11,13 +11,17 @@ namespace imua
   struct Detection
   {
 
-    float startTime;
-    float endTime;
-    float climaxTime;
-    float climaxValue;
-    std::string description;
+    float start;             // starting time
+    float end;               // ending time
+    float climax;            // climax time
+    float value;             // value for the current detection
+    std::string description; // description for the current detection
 
     Detection();
+
+    Detection(const float start,
+              const float end,
+              const std::string description);
 
   };
 }
