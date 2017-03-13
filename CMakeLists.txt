@@ -10,6 +10,7 @@ include_directories(include)
 # Create the list of source files
 set(SRC src/generic.cpp
         src/snowboard.cpp
+        src/surfing.cpp
         src/types.cpp)
 
 # Create a library
