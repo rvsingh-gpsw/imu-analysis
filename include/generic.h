@@ -12,9 +12,6 @@ namespace imua
     /**
      *
      */
-    bool detectJumps(std::vector<Detection> & detections,
-                     const float durationMin=0.5f);
-
     bool detectJumps(const IMU & imu,
                      std::vector<Detection> & detections,
                      const float gforceThreshold = 6.f,

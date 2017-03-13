@@ -39,4 +39,16 @@ namespace imua
   description(description){}
 
 
+  Detection::Detection(const float start,
+                       const float end,
+                       const float climax,
+                       const float value,
+                       const std::string description):
+  start(start),
+  end(end),
+  climax(climax),
+  value(value),
+  description(description){}
+
+
 }

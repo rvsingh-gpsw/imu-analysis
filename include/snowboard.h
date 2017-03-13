@@ -10,14 +10,14 @@ namespace imua
   {
 
     /**
-     *
+     * This is a dummy function. It uses the one of generic just to try the structure.
      */
-    bool detectJumps(std::vector<Detection> & detections);
+    bool detectJumps(const IMU & imu, std::vector<Detection> & detections);
 
     /**
-     *
+     * This is a dummy function.
      */
-    bool detect360(std::vector<Detection> & detections);
+    bool detect360(const IMU & imu, std::vector<Detection> & detections);
 
   }
 }

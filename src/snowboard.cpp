@@ -8,12 +8,12 @@ namespace imua
   namespace snowboard
   {
 
-    bool detectJumps(std::vector<Detection> & detections)
+    bool detectJumps(const IMU & imu, std::vector<Detection> & detections)
     {
-      return generic::detectJumps(detections, 0.66f);
+      return generic::detectJumps(imu, detections, 4.f, 0.2f);
     }
 
-    bool detect360(std::vector<Detection> & detections)
+    bool detect360(const IMU & imu, std::vector<Detection> & detections)
     {
       detections.push_back(Detection(12., 15., "360"));
       detections.push_back(Detection(16., 23.33, "360"));

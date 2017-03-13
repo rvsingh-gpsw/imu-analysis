@@ -8,26 +8,15 @@ namespace imua
   namespace generic
   {
 
-    bool detectJumps(std::vector<Detection> & detections,
-                     const float durationMin)
-    {
-      //std::cout << "Generic jump with duration of " << durationMin << " minimum" << std::endl;
-      detections.push_back(Detection(2., 5.5, "jump"));
-      detections.push_back(Detection(10., 20., "jump"));
-      detections.push_back(Detection(25., 25.5, "jump"));
-      return true;
-    }
-
-
     bool detectJumps(const IMU & imu,
                     std::vector<Detection> & detections,
                     const float gforceThreshold,
                     const float hangetimeThreshold)
     {
 
-      std::cout << "In the jump detector \n";
+      // std::cout << "In the jump detector \n";
       int num_samples = imu.accl.size;
-      std::cout << "num_samples = " <<  num_samples << std::endl;
+      // std::cout << "num_samples = " <<  num_samples << std::endl;
 
       //Get the norm of the acceleration
       float * gforce          = new float[num_samples];    if( gforce         == nullptr) { std::cout << "could not allocate memory and will exit\n"; return false;}
@@ -52,7 +41,7 @@ namespace imua
       }
 
       average_gforce /= num_samples;
-      printf("The average gforce is %f\n", average_gforce);
+      // printf("The average gforce is %f\n", average_gforce);
 
       //get approximately how many samples hangtime is
       float threshold_samples = hangetimeThreshold*imu.accl.samplingRate;
@@ -98,13 +87,13 @@ namespace imua
             int seconds = (int)jump_start % 60;
             float height = 0.5*9.8*( ((jump_end-jump_start)/2)*((jump_end-jump_start)/2));
 
-              std::cout << "We had a Jump at " << jump_start << " =>" <<  minutes << ":" << seconds << " for " << (jump_end-jump_start) << " seconds" << " height = " << height*3.28084  << "ft" << std::endl;
+              // std::cout << "We had a Jump at " << jump_start << " =>" <<  minutes << ":" << seconds << " for " << (jump_end-jump_start) << " seconds" << " height = " << height*3.28084  << "ft" << std::endl;
               // high_light jump_highlight;
               // jump_highlight.in_time    =    jump_start*1000;
               // jump_highlight.out_time   =    jump_end*1000;
               // jump_highlight.event_type =    STR2FOURCC("JUMP");
               // highlights.push_back(jump_highlight);
-              Detection detection(jump_start, jump_end, "jump");
+              Detection detection(jump_start, jump_end, (jump_start+jump_end)/2, height, "jump");
               detections.push_back(detection);
 
             }
