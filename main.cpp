@@ -5,6 +5,7 @@
 
 #include <generic.h>
 #include <snowboard.h>
+#include <surfing.h>
 #include <types.h>
 
 extern "C" {
@@ -209,6 +210,12 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> jumps;
     imua::generic::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+  }
+  else if (vertical=="surfing")
+  {
+    std::vector<imua::Detection> surfs;
+    imua::surfing::detectSurfing(imu, surfs, 5);
+    std::copy(surfs.begin(), surfs.end(), back_inserter(detections));
   }
   else if (vertical=="snowboard")
   {
