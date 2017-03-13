@@ -6,6 +6,45 @@ namespace imua
 {
 
   /**
+   *
+   */
+  struct Gyroscope
+  {
+    float   samplingRate;
+    int     size;
+    float * t;
+    float * x;
+    float * y;
+    float * z;
+
+    Gyroscope(); 
+  };
+
+  /**
+   *
+   */
+  struct Accelerometer
+  {
+    float   samplingRate;
+    int     size;
+    float * t;
+    float * x;
+    float * y;
+    float * z;
+
+    Accelerometer();
+  };
+
+  /**
+   *
+   */
+  struct IMU
+  {
+    Gyroscope     gyro;
+    Accelerometer accl;
+  };
+
+  /**
    * Detection
    */
   struct Detection
