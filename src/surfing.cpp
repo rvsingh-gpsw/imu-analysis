@@ -8,7 +8,7 @@ namespace imua
   namespace surfing
   {
 
-    bool detectSurfing(const IMU & imu, std::vector<Detection> & detections)
+    bool detectSurfing(const IMU & imu, std::vector<Detection> & detections, float min_surf_time)
     {
       return 0; //generic::detectJumps(imu, detections, 4.f, 0.2f);
     }
