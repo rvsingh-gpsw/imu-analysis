@@ -27,8 +27,8 @@ namespace imua
       // std::cout << "num_samples = " <<  num_samples << std::endl;
 
       //Get the norm of the acceleration
-      float * gforce          = new float[num_samples];    if( gforce         == nullptr) { std::cout << "could not allocate memory and will exit\n"; return false;}
-      float * gforce_lowpass  = new float[num_samples];    if( gforce_lowpass == nullptr) { std::cout << "could not allocate memory and will exit\n"; return false;}    //bigger than it needs to be
+      float * gforce          = new float[num_samples];    if( gforce         == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}
+      float * gforce_lowpass  = new float[num_samples];    if( gforce_lowpass == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}    //bigger than it needs to be
 
       //get the norm of acceleration
       for(int i = 0; i < num_samples; i++)

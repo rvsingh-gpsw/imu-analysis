@@ -17,9 +17,9 @@ namespace imua
           int num_samples = imu.accl.size;
 
           //Get the norm of the acceleration
-           float * norm_acc  = new float[num_samples];    if( norm_acc == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-           float * activity  = new float[num_samples];    if( activity == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-           float * average   = new float[num_samples];    if( average == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}    //bigger than it needs to be
+           float * norm_acc  = new float[num_samples];    if( norm_acc == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+           float * activity  = new float[num_samples];    if( activity == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+           float * average   = new float[num_samples];    if( average == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}    //bigger than it needs to be
 
 
            //GForce         = getGForce(Accelerometer(:,1),Accelerometer(:,2),Accelerometer(:,3)); //--------------------------------------------------------
