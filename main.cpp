@@ -39,7 +39,7 @@ bool parseParameters(int argc, char *argv[], std::string & vertical, std::string
 /**
  * Compare function for 2 detections.
  */
-bool compare(imua::Detection & a, imua::Detection & b)
+bool compare(const imua::Detection & a, const imua::Detection & b)
 {
     return a.start < b.start;
 }
