@@ -9,6 +9,8 @@ namespace imua
   namespace generic
   {
 
+    bool test();
+
     /**
      *
      */

@@ -1,0 +1,12 @@
+solutions = [
+  { "name"         : "gopro-lib-imu-analysis",
+    "url"          : "git@github.com:gopro/gopro-lib-imu-analysis.git@master",
+    "deps_file"    : "DEPS",
+    "managed"      : False,
+    "custom_deps"  : {
+    },
+    "safesync_url" : "",
+  },
+]
+version = "1.0"
+target_os = ["mac"]

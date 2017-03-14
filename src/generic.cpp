@@ -8,6 +8,14 @@ namespace imua
   namespace generic
   {
 
+
+    bool test()
+    {
+      std::cout << "Test SUCCESS" << std::endl;
+      return true;
+    }
+
+
     bool detectJumps(const IMU & imu,
                     std::vector<Detection> & detections,
                     const float gforceThreshold,

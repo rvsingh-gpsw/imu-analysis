@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
   std::string path;
   if (!parseParameters(argc, argv, vertical, path))
   {
-    std::cerr << "Usage: ./hello vertical path_to_video.MP4" << std::endl;
+    std::cerr << "Usage: ./detection vertical path_to_video.MP4" << std::endl;
     return EXIT_FAILURE;
   }
 
