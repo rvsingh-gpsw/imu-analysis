@@ -6,16 +6,16 @@
 
 typedef struct euler
 {
-  double sampling_rate;
+  float sampling_rate;
   int    num_samples;
-  double * t;
-  double * roll;
-  double * pitch;
-  double * yaw;
+  float * t;
+  float * roll;
+  float * pitch;
+  float * yaw;
   //initialize values
-  double  roll_init;
-  double  pitch_init;
-  double  yaw_init;
+  float  roll_init;
+  float  pitch_init;
+  float  yaw_init;
   //do an initializea
   int do_init;
 

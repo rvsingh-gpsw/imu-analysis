@@ -8,6 +8,7 @@
 #include <generic.h>
 #include <snowboard.h>
 #include <surfing.h>
+#include <gp5imu_Madgwick.h>
 #include <types.h>
 
 extern "C" {
@@ -225,6 +226,20 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> surfs;
     imua::surfing::detectSurfing(imu, surfs, 5);
     std::copy(surfs.begin(), surfs.end(), back_inserter(detections));
+  }
+  else if (vertical=="euler")
+  {
+   Euler_t euler;
+   getEulerAngles(imu, euler);   //need to deallocate memory
+
+   //print off the angles for debug
+   for (int i = 0; i < euler.num_samples; i++)
+   {
+       std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl; 
+
+   }
+
+
   }
   else if (vertical=="snowboard")
   {

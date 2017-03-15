@@ -8,7 +8,7 @@ namespace imua
 //*********************************************************************************************************
 
   float q0,q1,q2,q3, beta;
-  float roll, pitch, yaw;
+//  float roll, pitch, yaw;
 
 void MadgwickAHRSupdateIMU(const IMU & imu, float gx, float gy, float gz, float ax, float ay, float az) {
 	float recipNorm;
@@ -91,10 +91,10 @@ int  getEulerAngles(const IMU & imu, Euler_t & euler)
 
   euler.num_samples = imu.gyro.size; //num_samples;
   euler.sampling_rate = imu.gyro.samplingRate;
-  euler.t     = new double[euler.num_samples];    if( euler.t     == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.roll  = new double[euler.num_samples];    if( euler.roll  == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.pitch = new double[euler.num_samples];    if( euler.pitch == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.yaw   = new double[euler.num_samples];    if( euler.yaw   == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.t     = new float[euler.num_samples];    if( euler.t     == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.roll  = new float[euler.num_samples];    if( euler.roll  == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.pitch = new float[euler.num_samples];    if( euler.pitch == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.yaw   = new float[euler.num_samples];    if( euler.yaw   == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
 
 //might have to flush it a bit
 //MadgwickAHRSupdateIMU(0,0,0,ax,ay,az);
@@ -193,7 +193,7 @@ return 0;
 
 }
 
-
+#if 0
 void toEulerianAngle() //double& pitch, double& roll, double& yaw)
 {
 
@@ -203,4 +203,6 @@ void toEulerianAngle() //double& pitch, double& roll, double& yaw)
   yaw        = (atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3))*(57.2958);
 
 }
+#endif
+
 }//namespace
