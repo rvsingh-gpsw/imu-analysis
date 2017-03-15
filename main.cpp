@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <iomanip>
 
 #include <generic.h>
 #include <snowboard.h>
@@ -53,10 +54,17 @@ void displayDetections(const std::string & vertical, const std::vector<imua::Det
   for (size_t i=0; i<detections.size(); ++i)
   {
     const imua::Detection & det = detections[i];
+    // std::cout << "  " << vertical << " " << det.description;
+    // std::cout << " for " << det.end-det.start << " s";;
+    // std::cout << " (" << det.start << " -> " << det.end << ")";
+    // std::cout << " with value " << det.value << std::endl;
+
     std::cout << "  " << vertical << " " << det.description;
-    std::cout << " for " << det.end-det.start << " s";;
-    std::cout << " (" << det.start << " -> " << det.end << ")";
-    std::cout << " with value " << det.value << std::endl;
+    std::cout << " for " << std::fixed;
+    std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
+    std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
+    std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
+    std::cout << std::endl;
   }
 }
 
@@ -249,7 +257,7 @@ int main(int argc, char *argv[])
   // std::cout << "Gyro #         : " << imu.gyro.size << std::endl;
   // std::cout << "Accelero #     : " << imu.accl.size << std::endl;
   // std::cout << "Detections #   : " << detections.size() << std::endl;
-  // displayDetections(vertical, detections);
+  displayDetections(vertical, detections);
 
   // Deallocate the memory
   DeAllocateImu(&imu_c);
