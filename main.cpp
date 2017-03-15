@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 
+#include <math.h>
 #include <generic.h>
 #include <snowboard.h>
 #include <surfing.h>
@@ -233,7 +234,8 @@ int main(int argc, char *argv[])
    getEulerAngles(imu, euler);   //need to deallocate memory
 
    //print off the angles for debug
-   int count = 0;
+   float count = 0;
+   int report = 1;
    for (int i = 0; i < euler.num_samples; i++)
    {
 
@@ -241,8 +243,22 @@ int main(int argc, char *argv[])
      if(euler.t[i] > count)
      {
        std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
-       count++;
+       count += 0.5;
+
      }
+
+     //report if we had a flip , just need one printf hence the report flag
+      if(report)
+      {
+        if(fabs(euler.pitch[i]) > 140)
+        {
+          std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
+          report = 0;
+        }
+      }
+    if(fabs(euler.pitch[i]) < 140)
+     report = 1;
+
    }
 
 
