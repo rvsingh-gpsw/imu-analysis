@@ -233,10 +233,16 @@ int main(int argc, char *argv[])
    getEulerAngles(imu, euler);   //need to deallocate memory
 
    //print off the angles for debug
+   int count = 0;
    for (int i = 0; i < euler.num_samples; i++)
    {
-       std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl; 
 
+     //print every second for debug timeAsString
+     if(euler.t[i] > count)
+     {
+       std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
+       count++;
+     }
    }
 
 
