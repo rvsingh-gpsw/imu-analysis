@@ -235,7 +235,15 @@ int main(int argc, char *argv[])
 
    //print off the angles for debug
    float count = 0;
-   int report = 1;
+   int   report_jump = 1;
+   int   report_spin = 1;
+   int   secant_length = 100;   //1/4 second
+   float threshold_spin = 90;   //did we spin 90 degrees with 1/4 second?
+   int   spin_state = 0;
+   int   spin_current = 0;;
+   int   spin_count = 0;
+   int   spin_threshold_samples = 10;
+
    for (int i = 0; i < euler.num_samples; i++)
    {
 
@@ -247,19 +255,56 @@ int main(int argc, char *argv[])
 
      }
 
+     //-------------------------------------------------------------------------------------------
      //report if we had a flip , just need one printf hence the report flag
-      if(report)
+      if(report_jump)
       {
         if(fabs(euler.pitch[i]) > 140)
         {
           std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
-          report = 0;
+          report_jump = 0;
         }
       }
-    if(fabs(euler.pitch[i]) < 140)
-     report = 1;
+      //this is how we determine we are done the flip
+      if(fabs(euler.pitch[i]) < 140)
+      report_jump = 1;
 
-   }
+     //---------------------------------------------------------------------------------------------
+     //spin time, look at yaw
+     if( i < (euler.num_samples-secant_length))   //make sure we have enough samples
+     {
+         float diff = fabs(euler.yaw[i]-euler.yaw[i+secant_length]);
+         // do the modular arithmetic
+         if( diff >180.0f)
+           diff = (360.0f - diff);
+
+          if( diff > threshold_spin)
+            spin_current = 1;
+          else
+            spin_current = 0;
+
+          //OK, if we where in a spin and now we are not spinning, this is the end of the event
+          if( (spin_state == 1) && (spin_current == 0))
+          {
+            if(spin_count > spin_threshold_samples)
+            {
+              float corner_start = euler.t[i-spin_count];
+              float corner_end   = euler.t[i];
+              std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
+            }
+            spin_count = 0;  //reset the spin count (number of samples in this spin)
+          }
+      else if (spin_current == 1)  //we are still spinning
+  		{
+        spin_count++;
+  		}
+  		else; //not spinning
+
+  		//store for next interation
+   	  spin_state = spin_current;
+    } //if spin
+
+  }//loop
 
 
   }
