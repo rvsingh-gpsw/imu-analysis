@@ -125,7 +125,100 @@ namespace imua
       return true;
     }
 
+    //----------------------------------------------------------------------------------------------
+    void detectFlips(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections)
+    {
+      //detect flips
+      //print off the angles for debug
+      //float count = 0;
+      int   jump_state = 0;
+
+      for (int i = 0; i < euler.num_samples; i++)
+      {
+
+        #if 0
+        if(euler.t[i] > count)
+        {
+        std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
+        count += 0.5;
+      }
+      #endif
+      //-------------------------------------------------------------------------------------------
+      //report if we had a flip , just need one printf hence the report flag
+      if(jump_state == 0)
+      {
+        if(fabs(euler.pitch[i]) > 140)
+        {
+          std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
+          Detection detection(euler.t[i],euler.t[i] ,"FLIP");    //HACK
+          detections.push_back(detection);
+          jump_state = 1;
+        }
+      }
+      //this is how we determine we are done the flip
+      if(fabs(euler.pitch[i]) < 140)
+      jump_state = 0;
+    } //for
+  }//function ------------------------------------------------------------------------------------------
+
+  //------------------------------------------------------------------------------------------------
+  void detectSpins(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections, int secant_length, float threshold_spin_degrees)
+  {
+
+    //int   secant_length          = 100;   //1/4 second
+  //  float threshold_spin_degrees = 90;   //did we spin 90 degrees with 1/4 second?
+    int   spin_state = 0;
+    int   spin_current = 0;;
+    int   spin_count = 0;
+    int   spin_threshold_samples = 10;
+
+    for (int i = 0; i < (euler.num_samples-secant_length); i++)
+    {
+
+      #if 0
+           if(euler.t[i] > count)
+           {
+             std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
+             count += 0.5;
+           }
+      #endif
+
+        float diff = fabs(euler.yaw[i]-euler.yaw[i+secant_length]);
+        // do the modular arithmetic
+        if( diff >180.0f)
+          diff = (360.0f - diff);
+
+         if( diff > threshold_spin_degrees)
+           spin_current = 1;
+         else
+           spin_current = 0;
+
+         //OK, if we where in a spin and now we are not spinning, this is the end of the event
+         if( (spin_state == 1) && (spin_current == 0))
+         {
+           if(spin_count > spin_threshold_samples)
+           {
+             float corner_start = euler.t[i-spin_count];
+             float corner_end   = euler.t[i];
+             std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
+             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count] ,"SPIN");    //HACK
+             detections.push_back(detection);
+           }
+           spin_count = 0;  //reset the spin count (number of samples in this spin)
+         }
+     else if (spin_current == 1)  //we are still spinning
+     {
+       spin_count++;
+     }
+     else; //not spinning
+
+     //store for next interation
+     spin_state = spin_current;
+    } //if spin
 
 
-  }
-}
+  }//function
+
+
+}//class
+}//namespace

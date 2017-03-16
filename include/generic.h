@@ -18,5 +18,9 @@ namespace imua
                      const float gforceThreshold = 6.f,
                      const float hangetimeThreshold = 0.25f);
 
+
+    void detectFlips(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections);
+    void detectSpins(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections, int secant_length =100, float threshold_spin_degrees = 90.0);
+
   }
 }
