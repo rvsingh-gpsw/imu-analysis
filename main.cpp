@@ -246,14 +246,13 @@ int main(int argc, char *argv[])
    for (int i = 0; i < euler.num_samples; i++)
    {
 
-     //print every second for debug timeAsString
+#if 0
      if(euler.t[i] > count)
      {
        std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
        count += 0.5;
-
      }
-
+#endif
      //-------------------------------------------------------------------------------------------
      //report if we had a flip , just need one printf hence the report flag
       if(jump_state == 0)
@@ -267,11 +266,24 @@ int main(int argc, char *argv[])
       //this is how we determine we are done the flip
       if(fabs(euler.pitch[i]) < 140)
       jump_state = 0;
+ }
+
 
      //---------------------------------------------------------------------------------------------
      //spin time, look at yaw
-     if( i < (euler.num_samples-secant_length))   //make sure we have enough samples
+     //if( i < (euler.num_samples-secant_length))   //make sure we have enough samples
+     for (int i = 0; i < (euler.num_samples-secant_length); i++)
      {
+
+
+       #if 0
+            if(euler.t[i] > count)
+            {
+              std::cout << "Time: " << euler.t[i] << " Roll: " << euler.roll[i] << " Pitch: " << euler.pitch[i] << " Yaw: " << euler.yaw[i] << std::endl;
+              count += 0.5;
+            }
+       #endif
+
          float diff = fabs(euler.yaw[i]-euler.yaw[i+secant_length]);
          // do the modular arithmetic
          if( diff >180.0f)
@@ -303,7 +315,7 @@ int main(int argc, char *argv[])
    	  spin_state = spin_current;
     } //if spin
 
-  }//loop
+  //}//loop
 
 
   }
