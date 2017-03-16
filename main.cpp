@@ -235,8 +235,7 @@ int main(int argc, char *argv[])
 
    //print off the angles for debug
    float count = 0;
-   int   report_jump = 1;
-   int   report_spin = 1;
+   int   jump_state = 0;
    int   secant_length = 100;   //1/4 second
    float threshold_spin = 90;   //did we spin 90 degrees with 1/4 second?
    int   spin_state = 0;
@@ -257,17 +256,17 @@ int main(int argc, char *argv[])
 
      //-------------------------------------------------------------------------------------------
      //report if we had a flip , just need one printf hence the report flag
-      if(report_jump)
+      if(jump_state == 0)
       {
         if(fabs(euler.pitch[i]) > 140)
         {
           std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
-          report_jump = 0;
+          jump_state = 1;
         }
       }
       //this is how we determine we are done the flip
       if(fabs(euler.pitch[i]) < 140)
-      report_jump = 1;
+      jump_state = 0;
 
      //---------------------------------------------------------------------------------------------
      //spin time, look at yaw
