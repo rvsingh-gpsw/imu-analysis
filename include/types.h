@@ -2,8 +2,29 @@
 
 #include <string>
 
+
+
+typedef struct euler
+{
+  float sampling_rate;
+  int    num_samples;
+  float * t;
+  float * roll;
+  float * pitch;
+  float * yaw;
+  //initialize values
+  float  roll_init;
+  float  pitch_init;
+  float  yaw_init;
+  //do an initializea
+  int do_init;
+
+} Euler_t;
+
+
 namespace imua
 {
+
 
   /**
    *

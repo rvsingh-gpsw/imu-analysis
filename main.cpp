@@ -5,9 +5,11 @@
 #include <algorithm>
 #include <iomanip>
 
+#include <math.h>
 #include <generic.h>
 #include <snowboard.h>
 #include <surfing.h>
+#include <gp5imu_Madgwick.h>
 #include <types.h>
 
 extern "C" {
@@ -225,6 +227,20 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> surfs;
     imua::surfing::detectSurfing(imu, surfs, 5);
     std::copy(surfs.begin(), surfs.end(), back_inserter(detections));
+  }
+  else if (vertical=="euler")
+  {
+   Euler_t euler;
+   getEulerAngles(imu, euler);   //need to deallocate memory
+
+   std::vector<imua::Detection> flips;
+   imua::generic::detectFlips(imu, euler, flips);
+   std::copy(flips.begin(), flips.end(), back_inserter(detections));
+
+   std::vector<imua::Detection> spins;
+   imua::generic::detectSpins(imu,euler,spins);
+   std::copy(spins.begin(), spins.end(), back_inserter(detections));
+
   }
   else if (vertical=="snowboard")
   {

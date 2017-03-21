@@ -11,6 +11,7 @@ include_directories(include)
 set(SOURCES src/types.cpp
             src/generic.cpp
             src/snowboard.cpp
+            src/gp5imu_Madgwick.cpp
             src/surfing.cpp)
 
 # Create a library
