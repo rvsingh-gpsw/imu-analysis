@@ -32,7 +32,7 @@ namespace imua
                      const Euler & euler,
                      std::vector<Detection> & detections,
                      const int secant_length=100,
-                     const  float threshold_spin_degrees=90.f);
+                     const  float threshold_spin_degrees=90.f, int threshold_samples = 10);
 
     /**
      *

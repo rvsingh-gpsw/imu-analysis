@@ -173,7 +173,8 @@ namespace imua
                    const Euler & euler,
                    std::vector<Detection> & detections,
                    const int secant_length,
-                   const float threshold_spin_degrees)
+                   const float threshold_spin_degrees,
+                   int spin_threshold_samples)
   {
 
     //int   secant_length          = 100;   //1/4 second
@@ -181,7 +182,7 @@ namespace imua
     int   spin_state = 0;
     int   spin_current = 0;;
     int   spin_count = 0;
-    int   spin_threshold_samples = 10;
+  //  int   spin_threshold_samples = 10;
 
     for (int i = 0; i < (euler.num_samples-secant_length); i++)
     {
