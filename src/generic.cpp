@@ -168,6 +168,28 @@ namespace imua
     } //for
   }//function ------------------------------------------------------------------------------------------
 
+
+
+
+  //default settings for mountain bike
+  void detectCorners(const IMU & imu,
+                   const Euler & euler,
+                   std::vector<Detection> & detections,
+                   const int secant_length,
+                   const  float threshold_spin_degrees,
+                  int threshold_samples)
+{
+
+  detectSpins(imu, euler, detections,secant_length,threshold_spin_degrees,threshold_samples);
+
+  //rewrite the description/lable
+  for (size_t i=0; i<detections.size(); i++)
+  {
+    detections[i].description = "CORNER";
+  }
+
+}
+
   //------------------------------------------------------------------------------------------------
   void detectSpins(const IMU & imu,
                    const Euler & euler,
