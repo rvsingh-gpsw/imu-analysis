@@ -249,6 +249,30 @@ int main(int argc, char *argv[])
    if(euler.yaw   != NULL) free(euler.yaw);
 
   }
+  else if (vertical=="mountain_bike")
+  {
+   imua::Euler euler;
+   getEulerAngles(imu, euler, 1);   //need to deallocate memory
+
+   std::vector<imua::Detection> jumps;
+   imua::generic::detectJumps(imu, jumps, 9.81, 0.25);
+   std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+
+   std::vector<imua::Detection> flips;
+   imua::generic::detectFlips(imu, euler, flips);
+   std::copy(flips.begin(), flips.end(), back_inserter(detections));
+
+   std::vector<imua::Detection> corners;
+   imua::generic::detectCorners(imu, euler, corners);
+   std::copy(corners.begin(), corners.end(), back_inserter(detections));
+
+   //cheesy deallocate
+   if(euler.t != NULL)     free(euler.t);
+   if(euler.roll  != NULL) free(euler.roll);
+   if(euler.pitch != NULL) free(euler.pitch);
+   if(euler.yaw   != NULL) free(euler.yaw);
+
+  }
   else if (vertical=="snowboard")
   {
     std::vector<imua::Detection> jumps;
