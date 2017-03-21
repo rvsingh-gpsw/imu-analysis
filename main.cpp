@@ -235,6 +235,14 @@ int main(int argc, char *argv[])
    std::vector<imua::Detection> spins;
    imua::generic::detectSpins(imu, euler, spins);
    std::copy(spins.begin(), spins.end(), back_inserter(detections));
+
+
+   //cheesy deallocate
+   if(euler.t != NULL)     free(euler.t);
+   if(euler.roll  != NULL) free(euler.roll);
+   if(euler.pitch != NULL) free(euler.pitch);
+   if(euler.yaw   != NULL) free(euler.yaw);
+
   }
   else if (vertical=="snowboard")
   {
