@@ -1,5 +1,4 @@
 #include "generic.h"
-
 #include <iostream>
 #include <cmath>
 
