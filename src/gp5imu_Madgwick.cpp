@@ -86,7 +86,7 @@ void MadgwickAHRSupdateIMU(const IMU & imu, float gx, float gy, float gz, float 
 }
 
 //extract Euler angles and assume accelerometer is sampled half the gyro rate
-int  getEulerAngles(const IMU & imu, Euler_t & euler)
+int  getEulerAngles(const IMU & imu, Euler & euler)
 {
 
   euler.num_samples = imu.gyro.size; //num_samples;

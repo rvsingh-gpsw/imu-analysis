@@ -125,7 +125,9 @@ namespace imua
     }
 
     //----------------------------------------------------------------------------------------------
-    void detectFlips(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections)
+    void detectFlips(const IMU & imu,
+                     const Euler & euler,
+                     std::vector<Detection> & detections)
     {
       //detect flips
       //print off the angles for debug
@@ -161,7 +163,11 @@ namespace imua
   }//function ------------------------------------------------------------------------------------------
 
   //------------------------------------------------------------------------------------------------
-  void detectSpins(const IMU & imu, const Euler_t & euler, std::vector<Detection> & detections, int secant_length, float threshold_spin_degrees)
+  void detectSpins(const IMU & imu,
+                   const Euler & euler,
+                   std::vector<Detection> & detections,
+                   const int secant_length,
+                   const float threshold_spin_degrees)
   {
 
     //int   secant_length          = 100;   //1/4 second

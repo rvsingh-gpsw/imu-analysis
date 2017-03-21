@@ -13,10 +13,5 @@ namespace imua
      */
     bool detectJumps(const IMU & imu, std::vector<Detection> & detections);
 
-    /**
-     * This is a dummy function.
-     */
-    bool detect360(const IMU & imu, std::vector<Detection> & detections);
-
   }
 }

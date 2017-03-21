@@ -9,9 +9,9 @@ include_directories(include)
 
 # Create the list of source files
 set(SOURCES src/types.cpp
+            src/gp5imu_Madgwick.cpp
             src/generic.cpp
             src/snowboard.cpp
-            src/gp5imu_Madgwick.cpp
             src/surfing.cpp)
 
 # Create a library
@@ -20,6 +20,7 @@ add_library(${LIBNAME} STATIC ${SOURCES})
 
 # Create the list of header files
 set(HEADERS include/types.h
+            include/gp5imu_Madgwick.h
             include/generic.h
             include/snowboard.h
             include/surfing.h)
