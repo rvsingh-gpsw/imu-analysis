@@ -17,9 +17,9 @@ namespace imua
           int num_samples = imu.accl.size;
 
           //Get the norm of the acceleration
-           float * norm_acc  = new float[num_samples];    if( norm_acc == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-           float * activity  = new float[num_samples];    if( activity == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-           float * average   = new float[num_samples];    if( average == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}    //bigger than it needs to be
+           float * norm_acc  = new float[num_samples];    if( norm_acc == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}
+           float * activity  = new float[num_samples];    if( activity == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}
+           float * average   = new float[num_samples];    if( average == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}    //bigger than it needs to be
 
 
            //GForce         = getGForce(Accelerometer(:,1),Accelerometer(:,2),Accelerometer(:,3)); //--------------------------------------------------------
@@ -119,8 +119,8 @@ namespace imua
                     {
                       int minutes = (int)surf_start / 60;
                       int seconds = (int)surf_start % 60;
-                      std::cout << "We had a surf at " << surf_start << " =>" <<  minutes << ":" << seconds << " for " << (surf_end - surf_start) << " seconds" << std::endl;
-                      Detection detection(surf_start,surf_end,"Surf");
+                      //std::cout << "We had a surf at " << surf_start << " =>" <<  minutes << ":" << seconds << " for " << (surf_end - surf_start) << " seconds" << std::endl;
+                      Detection detection(surf_start, surf_end, "surf");
                       detections.push_back(detection);
         						}
                 }
@@ -143,7 +143,7 @@ namespace imua
           {
               if(count > surf_time_threshold)
               {
-                std::cout << "We had a surf at " << imu.accl.t[num_samples-count] << " for " << (imu.accl.t[num_samples-1]-imu.accl.t[num_samples-count]) << " seconds" << std::endl;
+                //std::cout << "We had a surf at " << imu.accl.t[num_samples-count] << " for " << (imu.accl.t[num_samples-1]-imu.accl.t[num_samples-count]) << " seconds" << std::endl;
                 Detection detection(imu.accl.t[num_samples-count],imu.accl.t[num_samples-1] ,"Surf");
                 detections.push_back(detection);
              }

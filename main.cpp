@@ -9,7 +9,7 @@
 #include <generic.h>
 #include <snowboard.h>
 #include <surfing.h>
-#include <gp5imu_Madgwick.h>
+#include <gp5imu_Madwick.h>
 #include <types.h>
 
 extern "C" {
@@ -56,12 +56,7 @@ void displayDetections(const std::string & vertical, const std::vector<imua::Det
   for (size_t i=0; i<detections.size(); ++i)
   {
     const imua::Detection & det = detections[i];
-    // std::cout << "  " << vertical << " " << det.description;
-    // std::cout << " for " << det.end-det.start << " s";;
-    // std::cout << " (" << det.start << " -> " << det.end << ")";
-    // std::cout << " with value " << det.value << std::endl;
-
-    std::cout << "  " << vertical << " " << det.description;
+    std::cout << "  " << vertical << "->" << det.description;
     std::cout << " for " << std::fixed;
     std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
     std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
@@ -230,17 +225,21 @@ int main(int argc, char *argv[])
   }
   else if (vertical=="euler")
   {
+<<<<<<< HEAD
    Euler_t euler;
    getEulerAngles(imu, euler, 1);   //need to deallocate memory
+=======
+   imua::Euler euler;
+   getEulerAngles(imu, euler);   //need to deallocate memory
+>>>>>>> be338fcdfed34c0936d2829d8eb49fe8ecde3daf
 
    std::vector<imua::Detection> flips;
    imua::generic::detectFlips(imu, euler, flips);
    std::copy(flips.begin(), flips.end(), back_inserter(detections));
 
    std::vector<imua::Detection> spins;
-   imua::generic::detectSpins(imu,euler,spins);
+   imua::generic::detectSpins(imu, euler, spins);
    std::copy(spins.begin(), spins.end(), back_inserter(detections));
-
   }
   else if (vertical=="snowboard")
   {
@@ -248,9 +247,6 @@ int main(int argc, char *argv[])
     imua::snowboard::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
 
-    std::vector<imua::Detection> threesixsty;
-    imua::snowboard::detect360(imu, threesixsty);
-    std::copy(threesixsty.begin(), threesixsty.end(), back_inserter(detections));
   }
   else
   {

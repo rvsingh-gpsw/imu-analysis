@@ -3,6 +3,7 @@
 #include <string>
 
 
+<<<<<<< HEAD
 
 typedef struct euler
 {
@@ -23,6 +24,8 @@ typedef struct euler
 } Euler_t;
 
 
+=======
+>>>>>>> be338fcdfed34c0936d2829d8eb49fe8ecde3daf
 namespace imua
 {
 
@@ -90,5 +93,24 @@ namespace imua
               const float value,
               const std::string description);
 
+  };
+
+  /**
+   *
+   */
+  struct Euler
+  {
+    float sampling_rate;
+    int    num_samples;
+    float * t;
+    float * roll;
+    float * pitch;
+    float * yaw;
+    //initialize values
+    float  roll_init;
+    float  pitch_init;
+    float  yaw_init;
+    //do an initializea
+    int do_init;
   };
 }
