@@ -235,7 +235,8 @@ namespace imua
              float corner_start = euler.t[i-spin_count];
              float corner_end   = euler.t[i];
              std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
-             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count]+1 ,"SPIN");    //HACK
+//             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count]+1 ,"SPIN");    //HACK
+             Detection detection(euler.t[i],euler.t[i]+0.5 ,"SPIN");    //HACK
              detections.push_back(detection);
            }
            spin_count = 0;  //reset the spin count (number of samples in this spin)
