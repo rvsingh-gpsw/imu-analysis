@@ -104,7 +104,8 @@ void exportSubtitles(const std::string & path, const std::string & vertical, con
 
           srtFile << i+1 << std::endl;
           srtFile << timeAsString(detections[i].start) << " --> " << timeAsString(detections[i].end) << std::endl;
-          srtFile << vertical << " : " << detections[i].description << " for " << detections[i].end-detections[i].start << " s" << std::endl;
+          srtFile << std::fixed;
+          srtFile << vertical << " : " << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << std::endl;
           srtFile << std::endl;
       }
       srtFile.close();
@@ -216,6 +217,10 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> jumps;
     imua::generic::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+
+    std::vector<imua::Detection> shaky;
+    imua::generic::detectShakyParts(imu, shaky);
+    std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
   }
   else if (vertical=="surfing")
   {

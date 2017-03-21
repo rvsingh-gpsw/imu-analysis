@@ -1,6 +1,11 @@
 #include "generic.h"
+#include "tools.h"
+
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <cmath>
+
 
 namespace imua
 {
@@ -124,6 +129,7 @@ namespace imua
       return true;
     }
 
+
     //----------------------------------------------------------------------------------------------
     void detectFlips(const IMU & imu,
                      const Euler & euler,
@@ -220,10 +226,99 @@ namespace imua
      //store for next interation
      spin_state = spin_current;
     } //if spin
-
-
   }//function
 
 
-}//class
-}//namespace
+    void detectShakyParts(const IMU & imu, std::vector<Detection> & detections)
+    {
+      // Constants
+      const float first = imu.gyro.t[0];
+      const float last  = imu.gyro.t[imu.gyro.size-1];
+      const float freq  = imu.gyro.size / (last-first);
+      const float chunk_duration = 1.f; // seconds
+      const int   chunk_size     = static_cast<int>(freq*chunk_duration);
+      const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
+
+      // Compute the norm
+      std::vector<float> norm;
+      ComputeNorm(imu.gyro.x, imu.gyro.y, imu.gyro.z, imu.gyro.size, norm);
+
+      // Compute high and low frequencies
+      std::vector<float> lf; // low frequency
+      std::vector<float> hf; // high frequency
+      SmoothArray(norm, lf);
+      hf.resize(lf.size());
+      for (int i=0; i<lf.size(); ++i)
+      {
+        hf[i] = norm[i] - lf[i];
+      }
+
+
+      bool dip = false; // Detection in progress
+      for (int i=0; i<chunk_nb; ++i)
+      {
+
+        // Index where the chunk starts and ends
+        const int start = i * chunk_size;
+        const int end   = std::min(start+chunk_size-1, imu.gyro.size-1);
+
+        // Compute the mean
+        float mean_lf = lf[start];
+        float mean_hf = hf[start];
+        int   count = 1;
+        for (int j=start+1; j<=end; ++j)
+        {
+          mean_lf += lf[j];
+          mean_hf += hf[j];
+          count++;
+        }
+        mean_lf /= count;
+        mean_hf /= count;
+
+        // Compute the variance
+        float var_lf = 0.f;
+        float var_hf = 0.f;
+        count = 0;
+        for (int j=start; j<=end; ++j)
+        {
+          const float tmp_lf = lf[j] - mean_lf;
+          const float tmp_hf = hf[j] - mean_hf;
+          var_lf += tmp_lf * tmp_lf;
+          var_hf += tmp_hf * tmp_hf;
+          count++;
+        }
+        var_lf /= count;
+        var_hf /= count;
+
+        // // Debug string
+        // std::stringstream ss;
+        // ss << std::fixed;
+        // ss << std::setprecision(3) << " Mlf = " << mean_lf << " Vlf = " << std::setprecision(3) << var_lf;
+        // ss << std::setprecision(3) << " Mhf = " << mean_hf << " Vhf = " << std::setprecision(3) << var_hf;
+        // Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
+        // detections.push_back(detection);
+
+        // Eventually add a detection
+        if (var_hf>0.02f)//(mean>1.)
+        {
+          if (dip)
+          {
+            detections.back().end = imu.gyro.t[end];
+          }
+          else
+          {
+            dip = true;
+            Detection detection(imu.gyro.t[start], imu.gyro.t[end], "shaky");
+            detections.push_back(detection);
+          }
+        }
+        else
+        {
+          dip = false;
+        }
+      }
+    }
+
+
+  } // namespace generic
+} // namespace imua

@@ -9,6 +9,7 @@ include_directories(include)
 
 # Create the list of source files
 set(SOURCES src/types.cpp
+            src/tools.cpp
             src/gp5imu_Madgwick.cpp
             src/generic.cpp
             src/snowboard.cpp
