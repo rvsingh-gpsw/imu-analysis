@@ -2,9 +2,6 @@
 
 #include <string>
 
-
-<<<<<<< HEAD
-
 typedef struct euler
 {
   float sampling_rate;
@@ -23,9 +20,6 @@ typedef struct euler
 
 } Euler_t;
 
-
-=======
->>>>>>> be338fcdfed34c0936d2829d8eb49fe8ecde3daf
 namespace imua
 {
 

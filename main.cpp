@@ -9,7 +9,7 @@
 #include <generic.h>
 #include <snowboard.h>
 #include <surfing.h>
-#include <gp5imu_Madwick.h>
+#include <gp5imu_Madgwick.h>
 #include <types.h>
 
 extern "C" {
@@ -225,13 +225,8 @@ int main(int argc, char *argv[])
   }
   else if (vertical=="euler")
   {
-<<<<<<< HEAD
    Euler_t euler;
    getEulerAngles(imu, euler, 1);   //need to deallocate memory
-=======
-   imua::Euler euler;
-   getEulerAngles(imu, euler);   //need to deallocate memory
->>>>>>> be338fcdfed34c0936d2829d8eb49fe8ecde3daf
 
    std::vector<imua::Detection> flips;
    imua::generic::detectFlips(imu, euler, flips);

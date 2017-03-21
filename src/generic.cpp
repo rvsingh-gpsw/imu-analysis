@@ -126,7 +126,7 @@ namespace imua
 
     //----------------------------------------------------------------------------------------------
     void detectFlips(const IMU & imu,
-                     const Euler & euler,
+                     const Euler_t & euler,
                      std::vector<Detection> & detections)
     {
       //detect flips
@@ -164,7 +164,7 @@ namespace imua
 
   //------------------------------------------------------------------------------------------------
   void detectSpins(const IMU & imu,
-                   const Euler & euler,
+                   const Euler_t & euler,
                    std::vector<Detection> & detections,
                    const int secant_length,
                    const float threshold_spin_degrees)
