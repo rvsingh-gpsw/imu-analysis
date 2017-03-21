@@ -22,14 +22,14 @@ namespace imua
      *
      */
     void detectFlips(const IMU & imu,
-                     const Euler_t & euler,
+                     const Euler & euler,
                      std::vector<Detection> & detections);
 
     /**
      *
      */
     void detectSpins(const IMU & imu,
-                     const Euler_t & euler,
+                     const Euler & euler,
                      std::vector<Detection> & detections,
                      const int secant_length=100,
                     const  float threshold_spin_degrees=90.f);
