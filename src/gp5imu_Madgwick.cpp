@@ -7,8 +7,8 @@ namespace imua
 {
 //*********************************************************************************************************
 
-  float q0,q1,q2,q3, beta;
-//  float roll, pitch, yaw;
+static  float q0,q1,q2,q3, beta;
+
 
 void MadgwickAHRSupdateIMU(const IMU & imu, float gx, float gy, float gz, float ax, float ay, float az) {
 	float recipNorm;
@@ -86,7 +86,7 @@ void MadgwickAHRSupdateIMU(const IMU & imu, float gx, float gy, float gz, float 
 }
 
 //extract Euler angles and assume accelerometer is sampled half the gyro rate
-int  getEulerAngles(const IMU & imu, Euler_t & euler)
+int  getEulerAngles(const IMU & imu, Euler_t & euler, int do_euler_init)
 {
 
   euler.num_samples = imu.gyro.size; //num_samples;
@@ -111,12 +111,17 @@ int  getEulerAngles(const IMU & imu, Euler_t & euler)
     float gx,gy,gz,ax,ay,az;
     int acc_count = 0;
 
-int do_euler_init = 0;
 
 //---------------------------------------------------------------------------------------------------
  if(do_euler_init)
  {
-   for(int i = 0; i < 400*2; i++) //do a 2 second init
+
+  float roll, pitch, yaw;
+  float roll_mean  = 0;
+  float pitch_mean = 0;
+  float yaw_mean   = 0;
+
+   for(int i = 0; i < euler.num_samples; i++)
    {
 
      gx = imu.gyro.x[i];
@@ -135,11 +140,28 @@ int do_euler_init = 0;
      }
 
      MadgwickAHRSupdateIMU(imu, gx, gy, gz, ax, ay, az);
+
+     roll       = (-asin(2.0f * (q1 * q3 - q0 * q2)))*(57.2958);
+     pitch      = (atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3))*(57.2958);
+     yaw        = (atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3))*(57.2958);
+
+
+      //this might screw things up ... make some negatives for the mean
+      if(roll  > 180)   roll  -= 360;
+      if(pitch > 180)   pitch -= 360;
+      if(yaw   > 180)   yaw   -= 360;
+
+
+     roll_mean  += roll;
+     pitch_mean += pitch;
+     yaw_mean   += yaw;
+
+
    }
 
-   euler.roll_init       = (-asin(2.0f * (q1 * q3 - q0 * q2)))*(57.2958);
-   euler.pitch_init      = (atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3))*(57.2958);
-   euler.yaw_init        = (atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3))*(57.2958);
+   euler.roll_mean       = roll_mean  / (float)euler.num_samples;
+   euler.pitch_mean      = pitch_mean / (float)euler.num_samples;
+   euler.yaw_mean        = yaw_mean   / (float)euler.num_samples;
 }
 
 
@@ -179,9 +201,9 @@ int do_euler_init = 0;
 
        if(do_euler_init)
        {
-         euler.roll[i]  -= euler.roll_init;
-         euler.pitch[i] -= euler.pitch_init;
-         euler.yaw[i]   -= euler.yaw_init;
+         euler.roll[i]  -= euler.roll_mean;
+         euler.pitch[i] -= euler.pitch_mean;
+         euler.yaw[i]   -= euler.yaw_mean;
        }
 
     }

@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
   else if (vertical=="euler")
   {
    Euler_t euler;
-   getEulerAngles(imu, euler);   //need to deallocate memory
+   getEulerAngles(imu, euler, 1);   //need to deallocate memory
 
    std::vector<imua::Detection> flips;
    imua::generic::detectFlips(imu, euler, flips);

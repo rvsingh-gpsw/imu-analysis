@@ -12,10 +12,11 @@ typedef struct euler
   float * roll;
   float * pitch;
   float * yaw;
-  //initialize values
-  float  roll_init;
-  float  pitch_init;
-  float  yaw_init;
+
+  //mean position values
+  float  roll_mean;
+  float  pitch_mean;
+  float  yaw_mean;
   //do an initializea
   int do_init;
 

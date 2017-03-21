@@ -150,7 +150,7 @@ namespace imua
         if(fabs(euler.pitch[i]) > 140)
         {
           std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
-          Detection detection(euler.t[i],euler.t[i]+.5 ,"FLIP");    //HACK
+          Detection detection(euler.t[i],euler.t[i]+1 ,"FLIP");    //HACK
           detections.push_back(detection);
           jump_state = 1;
         }
@@ -201,7 +201,7 @@ namespace imua
              float corner_start = euler.t[i-spin_count];
              float corner_end   = euler.t[i];
              std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
-             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count]+.5 ,"SPIN");    //HACK
+             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count]+1 ,"SPIN");    //HACK
              detections.push_back(detection);
            }
            spin_count = 0;  //reset the spin count (number of samples in this spin)
