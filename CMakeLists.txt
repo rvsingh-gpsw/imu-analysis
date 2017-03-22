@@ -12,7 +12,9 @@ set(SOURCES src/types.cpp
             src/tools.cpp
             src/gp5imu_Madgwick.cpp
             src/generic.cpp
-            src/snowboard.cpp
+            src/snowboarding.cpp
+            src/skateboarding.cpp
+            src/mountainbiking.cpp
             src/surfing.cpp)
 
 # Create a library
@@ -23,7 +25,9 @@ add_library(${LIBNAME} STATIC ${SOURCES})
 set(HEADERS include/types.h
             include/gp5imu_Madgwick.h
             include/generic.h
-            include/snowboard.h
+            include/snowboarding.h
+            include/skateboarding.h
+            include/mountainbiking.h
             include/surfing.h)
 
 # Create an executable using the created library

@@ -4,13 +4,15 @@
 #include <iomanip>
 #include <algorithm>
 #include <iomanip>
-
 #include <math.h>
+
+#include <types.h>
 #include <generic.h>
-#include <snowboard.h>
+#include <snowboarding.h>
+#include <skateboarding.h>
+#include <mountainbiking.h>
 #include <surfing.h>
 #include <gp5imu_Madgwick.h>
-#include <types.h>
 
 extern "C" {
   #include "gpmf_parser.h"
@@ -56,12 +58,24 @@ void displayDetections(const std::string & vertical, const std::vector<imua::Det
   for (size_t i=0; i<detections.size(); ++i)
   {
     const imua::Detection & det = detections[i];
-    std::cout << "  " << vertical << "->" << det.description;
-    std::cout << " for " << std::fixed;
-    std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
-    std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
-    std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
-    std::cout << std::endl;
+    // std::cout << "  " << vertical << "->" << det.description;
+    // std::cout << " for " << std::fixed;
+    // std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
+    // std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
+    // std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
+    // std::cout << std::endl;
+
+
+    // std::cout << std::setw(20) << std::left << vertical;
+    // std::cout << std::setw(20) << det.description;
+    // std::cout << " for " << std::fixed;
+    // std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
+    // std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
+    // std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
+    // std::cout << std::endl;
+
+    // printf("%-15s %-10s start : %6.1f end : %6.1f duration : %6.1f\n", vertical.c_str(), det.description.c_str(), det.start, det.end, det.end-det.start);
+    printf("%-15s %-10s %6.1f -> %6.1f = %6.1f seconds\n", vertical.c_str(), det.description.c_str(), det.start, det.end, det.end-det.start);
   }
 }
 
@@ -120,7 +134,7 @@ void exportSubtitles(const std::string & path, const std::string & vertical, con
 /**
  * Extract the IMU data and correct the number of samples.
  */
-bool ReadImuData(const std::string & path, IMU_t & imu)
+bool readImuData(const std::string & path, IMU_t & imu)
 {
     // Path as C string
     char *cstr = new char[path.length() + 1];
@@ -198,7 +212,7 @@ int main(int argc, char *argv[])
 
   // Access the IMU data
   IMU_t imu_c;
-  if (!ReadImuData(path, imu_c))
+  if (!readImuData(path, imu_c))
   {
       std::cerr << "Error: Unable to get IMU data." << std::endl;
       return EXIT_FAILURE;
@@ -228,6 +242,42 @@ int main(int argc, char *argv[])
     imua::surfing::detectSurfing(imu, surfs, 5);
     std::copy(surfs.begin(), surfs.end(), back_inserter(detections));
   }
+  else if (vertical=="snowboarding")
+  {
+    std::vector<imua::Detection> jumps;
+    imua::snowboarding::detectJumps(imu, jumps);
+    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+  }
+  else if (vertical=="skateboarding")
+  {
+    std::vector<imua::Detection> jumps;
+    imua::skateboarding::detectJumps(imu, jumps);
+    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+  }
+  else if (vertical=="mountainbiking")
+  {
+   imua::Euler euler;
+   getEulerAngles(imu, euler, 1);   //need to deallocate memory
+
+   std::vector<imua::Detection> jumps;
+   imua::mountainbiking::detectJumps(imu, jumps);
+   std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+
+   std::vector<imua::Detection> flips;
+   imua::mountainbiking::detectFlips(imu, euler, flips);
+   std::copy(flips.begin(), flips.end(), back_inserter(detections));
+
+   std::vector<imua::Detection> corners;
+   imua::mountainbiking::detectCorners(imu, euler, corners);
+   std::copy(corners.begin(), corners.end(), back_inserter(detections));
+
+   //cheesy deallocate
+   if(euler.t != NULL)     free(euler.t);
+   if(euler.roll  != NULL) free(euler.roll);
+   if(euler.pitch != NULL) free(euler.pitch);
+   if(euler.yaw   != NULL) free(euler.yaw);
+
+  }
   else if (vertical=="euler")
   {
    imua::Euler euler;
@@ -241,49 +291,17 @@ int main(int argc, char *argv[])
    imua::generic::detectSpins(imu, euler, spins);
    std::copy(spins.begin(), spins.end(), back_inserter(detections));
 
-
    //cheesy deallocate
    if(euler.t != NULL)     free(euler.t);
    if(euler.roll  != NULL) free(euler.roll);
    if(euler.pitch != NULL) free(euler.pitch);
    if(euler.yaw   != NULL) free(euler.yaw);
-
-  }
-  else if (vertical=="mountain_bike")
-  {
-   imua::Euler euler;
-   getEulerAngles(imu, euler, 1);   //need to deallocate memory
-
-   std::vector<imua::Detection> jumps;
-   imua::generic::detectJumps(imu, jumps, 9.81, 0.25);
-   std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
-
-   std::vector<imua::Detection> flips;
-   imua::generic::detectFlips(imu, euler, flips);
-   std::copy(flips.begin(), flips.end(), back_inserter(detections));
-
-   std::vector<imua::Detection> corners;
-   imua::generic::detectCorners(imu, euler, corners);
-   std::copy(corners.begin(), corners.end(), back_inserter(detections));
-
-   //cheesy deallocate
-   if(euler.t != NULL)     free(euler.t);
-   if(euler.roll  != NULL) free(euler.roll);
-   if(euler.pitch != NULL) free(euler.pitch);
-   if(euler.yaw   != NULL) free(euler.yaw);
-
-  }
-  else if (vertical=="snowboard")
-  {
-    std::vector<imua::Detection> jumps;
-    imua::snowboard::detectJumps(imu, jumps);
-    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
 
   }
   else
   {
     std::cerr << "Error: Invalid vertical." << std::endl;
-    std::cerr << "List : generic, snowboard" << std::endl;
+    std::cerr << "List : generic, snowboarding, surfing, mountainbiking, euler" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -294,13 +312,13 @@ int main(int argc, char *argv[])
   std::string srtPath = path.substr(0, path.length()-3) + "srt";
   exportSubtitles(srtPath, vertical, detections);
 
-  // // Display information and the detections
-  // std::cout << "Vertical       : " << vertical << std::endl;
-  // std::cout << "Video path     : " << path << std::endl;
-  // std::cout << "Subtitles path : " << srtPath << std::endl;
-  // std::cout << "Gyro #         : " << imu.gyro.size << std::endl;
-  // std::cout << "Accelero #     : " << imu.accl.size << std::endl;
-  // std::cout << "Detections #   : " << detections.size() << std::endl;
+  // Display information and the detections
+  std::cout << "Vertical       : " << vertical << std::endl;
+  std::cout << "Video path     : " << path << std::endl;
+  std::cout << "Subtitles path : " << srtPath << std::endl;
+  std::cout << "Gyro #         : " << imu.gyro.size << std::endl;
+  std::cout << "Accelero #     : " << imu.accl.size << std::endl;
+  std::cout << "Detections #   : " << detections.size() << std::endl;
   displayDetections(vertical, detections);
 
   // Deallocate the memory

@@ -13,13 +13,6 @@ namespace imua
   {
 
 
-    bool test()
-    {
-      std::cout << "Test SUCCESS" << std::endl;
-      return true;
-    }
-
-
     bool detectJumps(const IMU & imu,
                     std::vector<Detection> & detections,
                     const float gforceThreshold,
@@ -156,7 +149,7 @@ namespace imua
       {
         if(fabs(euler.pitch[i]) > 140)
         {
-          std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
+          //std::cout<< "We have a FLIP at " <<  euler.t[i] << std::endl;
           Detection detection(euler.t[i],euler.t[i]+1 ,"FLIP");    //HACK
           detections.push_back(detection);
           jump_state = 1;
@@ -173,22 +166,21 @@ namespace imua
 
   //default settings for mountain bike
   void detectCorners(const IMU & imu,
-                   const Euler & euler,
-                   std::vector<Detection> & detections,
-                   const int secant_length,
-                   const  float threshold_spin_degrees,
-                  int threshold_samples)
-{
-
-  detectSpins(imu, euler, detections,secant_length,threshold_spin_degrees,threshold_samples);
-
-  //rewrite the description/lable
-  for (size_t i=0; i<detections.size(); i++)
+                     const Euler & euler,
+                     std::vector<Detection> & detections,
+                     const int secant_length,
+                     const float threshold_spin_degrees,
+                     const int threshold_samples)
   {
-    detections[i].description = "CORNER";
-  }
 
-}
+    detectSpins(imu, euler, detections,secant_length,threshold_spin_degrees,threshold_samples);
+
+    //rewrite the description/lable
+    for (size_t i=0; i<detections.size(); i++)
+    {
+      detections[i].description = "corner";
+    }
+  }
 
   //------------------------------------------------------------------------------------------------
   void detectSpins(const IMU & imu,
@@ -196,7 +188,7 @@ namespace imua
                    std::vector<Detection> & detections,
                    const int secant_length,
                    const float threshold_spin_degrees,
-                   int spin_threshold_samples)
+                   const int spin_threshold_samples)
   {
 
     //int   secant_length          = 100;   //1/4 second
@@ -234,7 +226,7 @@ namespace imua
            {
              float corner_start = euler.t[i-spin_count];
              float corner_end   = euler.t[i];
-             std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
+             //std::cout << "We had a SPIN at " << euler.t[i-spin_count] << std::endl;
 //             Detection detection(euler.t[i-spin_count],euler.t[i-spin_count]+1 ,"SPIN");    //HACK
              Detection detection(euler.t[i],euler.t[i]+0.5 ,"SPIN");    //HACK
              detections.push_back(detection);
