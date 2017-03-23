@@ -9,7 +9,12 @@ namespace imua
   {
 
     /**
-     *
+     * Detect jumps.
+     * @param imu                 IMU structure
+     * @param detections          output array that will contain detections
+     * @param gforceThreshold     g-force must be under a threshold
+     * @param hangetimeThreshold  a jump must be long enough in terms of time
+     * @return true is everything went fine, false otherwise
      */
     bool detectJumps(const IMU & imu,
                      std::vector<Detection> & detections,
@@ -48,6 +53,13 @@ namespace imua
      */
     void detectShakyParts(const IMU & imu,
                           std::vector<Detection> & detections);
+
+    /**
+     *
+     */
+    void detectPans(const IMU & imu,
+                    std::vector<Detection> & leftPans,
+                    std::vector<Detection> & rightPans);
 
   }
 }

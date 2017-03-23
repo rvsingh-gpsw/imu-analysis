@@ -14,7 +14,6 @@ namespace imua
                    const int     n,
                    std::vector<float> & norm);
 
-
   /**
    *
    */

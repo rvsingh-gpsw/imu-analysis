@@ -235,6 +235,12 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> shaky;
     imua::generic::detectShakyParts(imu, shaky);
     std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
+
+    std::vector<imua::Detection> leftPans;
+    std::vector<imua::Detection> rightPans;
+    imua::generic::detectPans(imu, leftPans, rightPans);
+    std::copy(leftPans.begin(), leftPans.end(), back_inserter(detections));
+    std::copy(rightPans.begin(), rightPans.end(), back_inserter(detections));
   }
   else if (vertical=="surfing")
   {
