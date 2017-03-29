@@ -120,7 +120,7 @@ namespace imua
                       int minutes = (int)surf_start / 60;
                       int seconds = (int)surf_start % 60;
                       //std::cout << "We had a surf at " << surf_start << " =>" <<  minutes << ":" << seconds << " for " << (surf_end - surf_start) << " seconds" << std::endl;
-                      Detection detection(surf_start, surf_end, "surf");
+                      Detection detection(surf_start, surf_end, "surfing");
                       detections.push_back(detection);
         						}
                 }
@@ -144,7 +144,7 @@ namespace imua
               if(count > surf_time_threshold)
               {
                 //std::cout << "We had a surf at " << imu.accl.t[num_samples-count] << " for " << (imu.accl.t[num_samples-1]-imu.accl.t[num_samples-count]) << " seconds" << std::endl;
-                Detection detection(imu.accl.t[num_samples-count],imu.accl.t[num_samples-1] ,"Surf");
+                Detection detection(imu.accl.t[num_samples-count],imu.accl.t[num_samples-1] ,"surfing");
                 detections.push_back(detection);
              }
           }

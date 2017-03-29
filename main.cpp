@@ -119,7 +119,8 @@ void exportSubtitles(const std::string & path, const std::string & vertical, con
           srtFile << i+1 << std::endl;
           srtFile << timeAsString(detections[i].start) << " --> " << timeAsString(detections[i].end) << std::endl;
           srtFile << std::fixed;
-          srtFile << vertical << " : " << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << std::endl;
+          srtFile << "<font color=\"#00FF00\">" << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << "</font>" << std::endl;
+          // srtFile << vertical << " : " << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << std::endl;
           srtFile << std::endl;
       }
       srtFile.close();
