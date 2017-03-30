@@ -305,6 +305,12 @@ int main(int argc, char *argv[])
    if(euler.yaw   != NULL) free(euler.yaw);
 
   }
+  else if (vertical=="vincent")
+  {
+    std::vector<imua::Detection> shaky;
+    imua::generic::detectShakyParts(imu, shaky);
+    std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
+  }
   else
   {
     std::cerr << "Error: Invalid vertical." << std::endl;

@@ -91,10 +91,10 @@ int  getEulerAngles(const IMU & imu, Euler & euler, int do_euler_init)
 
   euler.num_samples = imu.gyro.size; //num_samples;
   euler.sampling_rate = imu.gyro.samplingRate;
-  euler.t     = new float[euler.num_samples];    if( euler.t     == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.roll  = new float[euler.num_samples];    if( euler.roll  == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.pitch = new float[euler.num_samples];    if( euler.pitch == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
-  euler.yaw   = new float[euler.num_samples];    if( euler.yaw   == nullptr) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.t     = new float[euler.num_samples];    if( euler.t     == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.roll  = new float[euler.num_samples];    if( euler.roll  == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.pitch = new float[euler.num_samples];    if( euler.pitch == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
+  euler.yaw   = new float[euler.num_samples];    if( euler.yaw   == NULL) { std::cout << "could not allocate memory and will exit\n"; return 1;}
 
 //might have to flush it a bit
 //MadgwickAHRSupdateIMU(0,0,0,ax,ay,az);
