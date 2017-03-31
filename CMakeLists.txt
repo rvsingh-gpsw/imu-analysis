@@ -20,6 +20,7 @@ set(SOURCES src/types.cpp
 # Create a library
 set(LIBNAME IMUAnalysis)
 add_library(${LIBNAME} STATIC ${SOURCES})
+set_property(TARGET ${LIBNAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Create the list of header files
 set(HEADERS include/types.h
