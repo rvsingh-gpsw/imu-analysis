@@ -116,8 +116,8 @@ namespace imua
        }
 
       //dealocate the memory
-       if(gforce)          free(gforce);
-       if(gforce_lowpass)  free(gforce_lowpass);
+      delete[](gforce);
+      delete[](gforce_lowpass);
 
       return true;
     }

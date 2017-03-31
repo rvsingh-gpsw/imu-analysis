@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
    std::copy(corners.begin(), corners.end(), back_inserter(detections));
 
    //cheesy deallocate
-   if(euler.t != NULL)     free(euler.t);
+   if(euler.t != NULL)     d(euler.t);
    if(euler.roll  != NULL) free(euler.roll);
    if(euler.pitch != NULL) free(euler.pitch);
    if(euler.yaw   != NULL) free(euler.yaw);
@@ -299,10 +299,10 @@ int main(int argc, char *argv[])
    std::copy(spins.begin(), spins.end(), back_inserter(detections));
 
    //cheesy deallocate
-   if(euler.t != NULL)     free(euler.t);
-   if(euler.roll  != NULL) free(euler.roll);
-   if(euler.pitch != NULL) free(euler.pitch);
-   if(euler.yaw   != NULL) free(euler.yaw);
+   if(euler.t != NULL)     delete[](euler.t);
+   if(euler.roll  != NULL) delete[](euler.roll);
+   if(euler.pitch != NULL) delete[](euler.pitch);
+   if(euler.yaw   != NULL) delete[](euler.yaw);
 
   }
   else if (vertical=="vincent")

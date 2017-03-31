@@ -31,11 +31,12 @@ set(HEADERS include/types.h
             include/surfing.h)
 
 # Create an executable using the created library
-set(EXENAME detector)
-add_executable(${EXENAME} main.cpp gpmf_parser.c)
-target_link_libraries(${EXENAME} ${LIBNAME})
+# set(EXENAME detector)
+# add_executable(${EXENAME} main.cpp gpmf_parser.c)
+# target_link_libraries(${EXENAME} ${LIBNAME})
 
 # Indicate where to install the library, the executable and the headers
 install(TARGETS ${LIBNAME} DESTINATION lib)
-install(TARGETS ${EXENAME} DESTINATION bin)
+# install(TARGETS ${EXENAME} DESTINATION bin)
 install(FILES   ${HEADERS} DESTINATION include/${LIBNAME})
+
