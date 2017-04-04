@@ -53,6 +53,8 @@ namespace imua
      */
     void detectShakyParts(const IMU & imu,
                           std::vector<Detection> & detections);
+    void detectShakyPartsNew(const IMU & imu,
+                          std::vector<Detection> & detections);
 
     /**
      *

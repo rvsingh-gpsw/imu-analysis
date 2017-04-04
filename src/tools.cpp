@@ -48,4 +48,31 @@ namespace imua
         output[i] = alpha * output[i] + beta * output[i+1];
     }
   }
+
+
+  void SmoothArray(const float * input,
+                   const int     size,
+                   std::vector<float> & output,
+                   const float weight)
+  {
+
+    // Allocate the memory
+    output.clear();
+    output.resize(size);
+
+    // Parameters
+    const float alpha = weight;
+    const float beta  = 1.f - weight;
+
+    // Forward smoothing
+    output[0] = input[0];
+    for (int i=1; i<size; ++i) {
+        output[i] = alpha * input[i] + beta * output[i-1];
+    }
+
+    // Backward smoothing
+    for (int i=size-2; i>=0; --i) {
+        output[i] = alpha * output[i] + beta * output[i+1];
+    }
+  }
 }

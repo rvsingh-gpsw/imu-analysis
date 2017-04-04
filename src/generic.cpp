@@ -245,6 +245,100 @@ namespace imua
   }//function
 
 
+    // void detectShakyParts(const IMU & imu, std::vector<Detection> & detections)
+    // {
+    //   // Constants
+    //   const float first = imu.gyro.t[0];
+    //   const float last  = imu.gyro.t[imu.gyro.size-1];
+    //   const float freq  = imu.gyro.size / (last-first);
+    //   const float chunk_duration = 1.f; // seconds
+    //   const int   chunk_size     = static_cast<int>(freq*chunk_duration);
+    //   const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
+
+    //   // Compute the norm
+    //   std::vector<float> norm;
+    //   ComputeNorm(imu.gyro.x, imu.gyro.y, imu.gyro.z, imu.gyro.size, norm);
+
+    //   // Compute high and low frequencies
+    //   std::vector<float> lf; // low frequency
+    //   std::vector<float> hf; // high frequency
+    //   SmoothArray(norm, lf);
+    //   hf.resize(lf.size());
+    //   for (int i=0; i<lf.size(); ++i) {
+    //     hf[i] = norm[i] - lf[i];
+    //   }
+
+
+    //   bool dip = false; // Detection in progress
+    //   for (int i=0; i<chunk_nb; ++i)
+    //   {
+
+    //     // Index where the chunk starts and ends
+    //     const int start = i * chunk_size;
+    //     const int end   = std::min(start+chunk_size-1, imu.gyro.size-1);
+
+    //     // Compute the mean
+    //     float mean_lf = lf[start];
+    //     float mean_hf = hf[start];
+    //     float mean_hf2 = hf[start];
+    //     int   count = 1;
+    //     for (int j=start+1; j<=end; ++j)
+    //     {
+    //       mean_lf += lf[j];
+    //       mean_hf += hf[j];
+    //       mean_hf2 += (hf[j]*hf[j]);
+    //       count++;
+    //     }
+    //     mean_lf /= count;
+    //     mean_hf /= count;
+    //     mean_hf2 /= count;
+
+    //     // // Compute the variance
+    //     // float var_lf = 0.f;
+    //     // float var_hf = 0.f;
+    //     // count = 0;
+    //     // for (int j=start; j<=end; ++j)
+    //     // {
+    //     //   const float tmp_lf = lf[j] - mean_lf;
+    //     //   const float tmp_hf = hf[j] - mean_hf;
+    //     //   var_lf += tmp_lf * tmp_lf;
+    //     //   var_hf += tmp_hf * tmp_hf;
+    //     //   count++;
+    //     // }
+    //     // var_lf /= count;
+    //     // var_hf /= count;
+
+    //     // Debug string
+    //     std::stringstream ss;
+    //     ss << std::fixed;
+    //     // ss << std::setprecision(3) << " Mlf = " << mean_lf << " Vlf = " << std::setprecision(3) << var_lf;
+    //     // ss << std::setprecision(3) << " Mhf = " << mean_hf  << std::setprecision(3) << " Mhf2 = " << mean_hf2 << " Vhf = " << std::setprecision(3) << var_hf;
+    //     ss << std::setprecision(3) << " Mean = " << mean_hf << " Var = " << mean_hf2;
+    //     Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
+    //     detections.push_back(detection);
+
+    //     // // Eventually add a detection
+    //     // if (var_hf>0.02f)//(mean>1.)
+    //     // {
+    //     //   if (dip)
+    //     //   {
+    //     //     detections.back().end = imu.gyro.t[end];
+    //     //   }
+    //     //   else
+    //     //   {
+    //     //     dip = true;
+    //     //     Detection detection(imu.gyro.t[start], imu.gyro.t[end], "shaky");
+    //     //     detections.push_back(detection);
+    //     //   }
+    //     // }
+    //     // else
+    //     // {
+    //     //   dip = false;
+    //     // }
+    //   }
+    // }
+
+
     void detectShakyParts(const IMU & imu, std::vector<Detection> & detections)
     {
       // Constants
@@ -255,18 +349,23 @@ namespace imua
       const int   chunk_size     = static_cast<int>(freq*chunk_duration);
       const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
 
-      // Compute the norm
-      std::vector<float> norm;
-      ComputeNorm(imu.gyro.x, imu.gyro.y, imu.gyro.z, imu.gyro.size, norm);
+      // Compute low frequencies
+      std::vector<float> x_lf;
+      std::vector<float> y_lf;
+      std::vector<float> z_lf;
+      SmoothArray(imu.gyro.x, imu.gyro.size, x_lf, 0.02f);
+      SmoothArray(imu.gyro.y, imu.gyro.size, y_lf, 0.02f);
+      SmoothArray(imu.gyro.z, imu.gyro.size, z_lf, 0.02f);
 
-      // Compute high and low frequencies
-      std::vector<float> lf; // low frequency
-      std::vector<float> hf; // high frequency
-      SmoothArray(norm, lf);
-      hf.resize(lf.size());
-      for (int i=0; i<lf.size(); ++i)
+      // Compute high frequencies
+      std::vector<float> x_hf(imu.gyro.size);
+      std::vector<float> y_hf(imu.gyro.size);
+      std::vector<float> z_hf(imu.gyro.size);
+      for (int i=0; i<imu.gyro.size; ++i)
       {
-        hf[i] = norm[i] - lf[i];
+        x_hf[i] = imu.gyro.x[i] - x_lf[i];
+        y_hf[i] = imu.gyro.y[i] - y_lf[i];
+        z_hf[i] = imu.gyro.z[i] - z_lf[i];
       }
 
 
@@ -279,43 +378,48 @@ namespace imua
         const int end   = std::min(start+chunk_size-1, imu.gyro.size-1);
 
         // Compute the mean
-        float mean_lf = lf[start];
-        float mean_hf = hf[start];
-        int   count = 1;
-        for (int j=start+1; j<=end; ++j)
-        {
-          mean_lf += lf[j];
-          mean_hf += hf[j];
-          count++;
-        }
-        mean_lf /= count;
-        mean_hf /= count;
-
-        // Compute the variance
-        float var_lf = 0.f;
-        float var_hf = 0.f;
-        count = 0;
+        float mean_x = 0;
+        float mean_y = 0;
+        float mean_z = 0;
+        float var_x  = 0;
+        float var_y  = 0;
+        float var_z  = 0;
+        int   count  = 0;
         for (int j=start; j<=end; ++j)
         {
-          const float tmp_lf = lf[j] - mean_lf;
-          const float tmp_hf = hf[j] - mean_hf;
-          var_lf += tmp_lf * tmp_lf;
-          var_hf += tmp_hf * tmp_hf;
+          mean_x += imu.gyro.x[j];
+          mean_y += imu.gyro.y[j];
+          mean_z += imu.gyro.z[j];
+          var_x  += x_hf[j] * x_hf[j];
+          var_y  += y_hf[j] * y_hf[j];
+          var_z  += z_hf[j] * z_hf[j];
           count++;
         }
-        var_lf /= count;
-        var_hf /= count;
+        mean_x /= count;
+        mean_y /= count;
+        mean_z /= count;
+        var_x  /= count;
+        var_y  /= count;
+        var_z  /= count;
 
-        // // Debug string
+        const float norm   = std::sqrt(var_x+var_y+var_z);
+
+        var_x  = std::sqrt(var_x);
+        var_y  = std::sqrt(var_y);
+        var_z  = std::sqrt(var_z);
+
+        // Debug string
         // std::stringstream ss;
-        // ss << std::fixed;
-        // ss << std::setprecision(3) << " Mlf = " << mean_lf << " Vlf = " << std::setprecision(3) << var_lf;
-        // ss << std::setprecision(3) << " Mhf = " << mean_hf << " Vhf = " << std::setprecision(3) << var_hf;
+        // ss << std::fixed << std::setprecision(3);
+        // ss << "mx= " << std::setw(6) << mean_x << " sx= " << std::setw(6) << var_x << "\n";
+        // ss << "my= " << std::setw(6) << mean_y << " sy= " << std::setw(6) << var_y << "\n";
+        // ss << "mz= " << std::setw(6) << mean_z << " sz= " << std::setw(6) << var_z << "\n";
+        // ss << "norm= " << std::setw(6) << norm << "\n";
         // Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
         // detections.push_back(detection);
 
         // Eventually add a detection
-        if (var_hf>0.02f)//(mean>1.)
+        if (norm>1.f)
         {
           if (dip)
           {
@@ -332,6 +436,58 @@ namespace imua
         {
           dip = false;
         }
+      }
+    }
+
+
+    void detectShakyPartsNew(const IMU & imu, std::vector<Detection> & detections)
+    {
+      // Constants
+      const float first = imu.gyro.t[0];
+      const float last  = imu.gyro.t[imu.gyro.size-1];
+      const float freq  = imu.gyro.size / (last-first);
+      const float chunk_duration = 1.f; // seconds
+      const int   chunk_size     = static_cast<int>(freq*chunk_duration);
+      const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
+
+
+
+      for (int i=0; i<chunk_nb; ++i)
+      {
+
+        // Index where the chunk starts and ends
+        const int start = i * chunk_size;
+        const int end   = std::min(start+chunk_size-1, imu.gyro.size-1);
+
+
+
+        float* min_x = std::min_element(imu.gyro.x+start, imu.gyro.x+end+1);
+        float* max_x = std::max_element(imu.gyro.x+start, imu.gyro.x+end+1);
+        float* min_y = std::min_element(imu.gyro.y+start, imu.gyro.y+end+1);
+        float* max_y = std::max_element(imu.gyro.y+start, imu.gyro.y+end+1);
+        float* min_z = std::min_element(imu.gyro.z+start, imu.gyro.z+end+1);
+        float* max_z = std::max_element(imu.gyro.z+start, imu.gyro.z+end+1);
+
+        std::stringstream ss;
+        ss << std::fixed;
+        // // ss << "min_x=" << std::setprecision(2) << std::setw(5) << *min_x << " ";
+        // // ss << "max_x=" << std::setprecision(2) << std::setw(5) << *max_x << " ";
+        // ss << "amp_x=" << std::setprecision(2) << std::setw(5) << *max_x-*min_x << " ";
+        // // ss << "min_y=" << std::setprecision(2) << std::setw(5) << *min_y << " ";
+        // // ss << "max_y=" << std::setprecision(2) << std::setw(5) << *max_y << " ";
+        // ss << "amp_y=" << std::setprecision(2) << std::setw(5) << *max_y-*min_y << " ";
+        // // ss << "min_z=" << std::setprecision(2) << std::setw(5) << *min_z << " ";
+        // // ss << "max_z=" << std::setprecision(2) << std::setw(5) << *max_z << " ";
+        // ss << "amp_z=" << std::setprecision(2) << std::setw(5) << *max_z-*min_z << " ";
+
+        ss << std::setprecision(2) << std::setw(5) << *max_x-*min_x << " ";
+        ss << std::setprecision(2) << std::setw(5) << *max_y-*min_y << " ";
+        ss << std::setprecision(2) << std::setw(5) << *max_z-*min_z;
+
+        // if (*max_x-*min_x>2.f || *max_y-*min_y)
+
+        Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
+        detections.push_back(detection);
       }
     }
 
