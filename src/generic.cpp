@@ -539,11 +539,11 @@ namespace imua
         // We change the mode of detection
         else {
           if (current_val==1) {
-            Detection detection(chunk_start[i], chunk_end[i], "shaky medium");
+            Detection detection(chunk_start[i], chunk_end[i], 1., "shaky medium");
             detections.push_back(detection);
           }
           else if (current_val==2) {
-            Detection detection(chunk_start[i], chunk_end[i], "shaky strong");
+            Detection detection(chunk_start[i], chunk_end[i], 2., "shaky strong");
             detections.push_back(detection);
           }
         }

@@ -77,7 +77,7 @@ void displayDetections(const std::string & vertical, const std::vector<imua::Det
     // std::cout << std::endl;
 
     // printf("%-15s %-10s start : %6.1f end : %6.1f duration : %6.1f\n", vertical.c_str(), det.description.c_str(), det.start, det.end, det.end-det.start);
-    printf("%-15s %-10s %6.1f -> %6.1f = %6.1f seconds\n", vertical.c_str(), det.description.c_str(), det.start, det.end, det.end-det.start);
+    printf("%-15s %-10s %f %6.1f -> %6.1f = %6.1f seconds\n", vertical.c_str(), det.description.c_str(), det.value, det.start, det.end, det.end-det.start);
   }
 }
 
