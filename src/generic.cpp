@@ -428,7 +428,7 @@ namespace imua
           else
           {
             dip = true;
-            Detection detection(imu.gyro.t[start], imu.gyro.t[end], "shaky");
+            Detection detection(imu.gyro.t[start], imu.gyro.t[end], "shaky :P");
             detections.push_back(detection);
           }
         }
@@ -440,7 +440,10 @@ namespace imua
     }
 
 
-    void detectShakyPartsNew(const IMU & imu, std::vector<Detection> & detections)
+    void detectShakyParts(const IMU & imu,
+                          std::vector<Detection> & detections,
+                          const float thresholdLow,
+                          const float thresholdHigh)
     {
       // Constants
       const float first = imu.gyro.t[0];
@@ -450,8 +453,29 @@ namespace imua
       const int   chunk_size     = static_cast<int>(freq*chunk_duration);
       const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
 
+      // Compute low frequencies
+      std::vector<float> x_lf;
+      std::vector<float> y_lf;
+      std::vector<float> z_lf;
+      SmoothArray(imu.gyro.x, imu.gyro.size, x_lf, 0.02f);
+      SmoothArray(imu.gyro.y, imu.gyro.size, y_lf, 0.02f);
+      SmoothArray(imu.gyro.z, imu.gyro.size, z_lf, 0.02f);
 
+      // Compute high frequencies
+      std::vector<float> x_hf(imu.gyro.size);
+      std::vector<float> y_hf(imu.gyro.size);
+      std::vector<float> z_hf(imu.gyro.size);
+      for (int i=0; i<imu.gyro.size; ++i)
+      {
+        x_hf[i] = imu.gyro.x[i] - x_lf[i];
+        y_hf[i] = imu.gyro.y[i] - y_lf[i];
+        z_hf[i] = imu.gyro.z[i] - z_lf[i];
+      }
 
+      // Compute the shakiness value for each chunk
+      std::vector<int>   chunk_value(chunk_nb);
+      std::vector<float> chunk_start(chunk_nb);
+      std::vector<float> chunk_end(chunk_nb);
       for (int i=0; i<chunk_nb; ++i)
       {
 
@@ -459,35 +483,73 @@ namespace imua
         const int start = i * chunk_size;
         const int end   = std::min(start+chunk_size-1, imu.gyro.size-1);
 
+        // Compute the variances
+        float var_x  = 0;
+        float var_y  = 0;
+        float var_z  = 0;
+        int   count  = 0;
+        for (int j=start; j<=end; ++j) {
+          var_x  += x_hf[j] * x_hf[j];
+          var_y  += y_hf[j] * y_hf[j];
+          var_z  += z_hf[j] * z_hf[j];
+          count++;
+        }
+        var_x /= count;
+        var_y /= count;
+        var_z /= count;
 
+        // Compute the norm of the standard deviation
+        const float norm = std::sqrt(var_x + var_y + var_z);
 
-        float* min_x = std::min_element(imu.gyro.x+start, imu.gyro.x+end+1);
-        float* max_x = std::max_element(imu.gyro.x+start, imu.gyro.x+end+1);
-        float* min_y = std::min_element(imu.gyro.y+start, imu.gyro.y+end+1);
-        float* max_y = std::max_element(imu.gyro.y+start, imu.gyro.y+end+1);
-        float* min_z = std::min_element(imu.gyro.z+start, imu.gyro.z+end+1);
-        float* max_z = std::max_element(imu.gyro.z+start, imu.gyro.z+end+1);
+        // // Debug string
+        // std::stringstream ss;
+        // ss << std::fixed << std::setprecision(3);
+        // ss << "variance ";
+        // ss << "x= " << std::setw(6) << var_x << " ";
+        // ss << "y= " << std::setw(6) << var_y << " ";
+        // ss << "z= " << std::setw(6) << var_z << " ";
+        // ss << "norm= " << std::setw(6) << norm;
+        // Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
+        // detections.push_back(detection);
 
-        std::stringstream ss;
-        ss << std::fixed;
-        // // ss << "min_x=" << std::setprecision(2) << std::setw(5) << *min_x << " ";
-        // // ss << "max_x=" << std::setprecision(2) << std::setw(5) << *max_x << " ";
-        // ss << "amp_x=" << std::setprecision(2) << std::setw(5) << *max_x-*min_x << " ";
-        // // ss << "min_y=" << std::setprecision(2) << std::setw(5) << *min_y << " ";
-        // // ss << "max_y=" << std::setprecision(2) << std::setw(5) << *max_y << " ";
-        // ss << "amp_y=" << std::setprecision(2) << std::setw(5) << *max_y-*min_y << " ";
-        // // ss << "min_z=" << std::setprecision(2) << std::setw(5) << *min_z << " ";
-        // // ss << "max_z=" << std::setprecision(2) << std::setw(5) << *max_z << " ";
-        // ss << "amp_z=" << std::setprecision(2) << std::setw(5) << *max_z-*min_z << " ";
+        // Deduce the chunk value
+        if (norm<=thresholdLow)
+          chunk_value[i] = 0;
+        else if (norm<=thresholdHigh)
+          chunk_value[i] = 1;
+        else
+          chunk_value[i] = 2;
 
-        ss << std::setprecision(2) << std::setw(5) << *max_x-*min_x << " ";
-        ss << std::setprecision(2) << std::setw(5) << *max_y-*min_y << " ";
-        ss << std::setprecision(2) << std::setw(5) << *max_z-*min_z;
+        // Set when the chunk starts and ends
+        chunk_start[i] = imu.gyro.t[start];
+        chunk_end[i]   = imu.gyro.t[end];
+      }
 
-        // if (*max_x-*min_x>2.f || *max_y-*min_y)
+      // Now deduce detections
+      int previous_val = 0;
+      for (int i=0; i<chunk_nb; ++i)
+      {
+        // If the shakiness mode is the same as before, we update the detection's end
+        const int current_val = chunk_value[i];
+        if (current_val==previous_val) {
+          if (current_val>0) {
+            detections.back().end = chunk_end[i];
+          }
+        }
+        // We change the mode of detection
+        else {
+          if (current_val==1) {
+            Detection detection(chunk_start[i], chunk_end[i], "shaky medium");
+            detections.push_back(detection);
+          }
+          else if (current_val==2) {
+            Detection detection(chunk_start[i], chunk_end[i], "shaky strong");
+            detections.push_back(detection);
+          }
+        }
 
-        Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
-        detections.push_back(detection);
+        // Update the previous detection for next chunk
+        previous_val = current_val;
       }
     }
 
