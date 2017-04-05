@@ -14,6 +14,8 @@
 #include <surfing.h>
 #include <gp5imu_Madgwick.h>
 
+#include <cstring>
+
 extern "C" {
   #include "gpmf_parser.h"
 }
