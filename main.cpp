@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
 
     std::vector<imua::Detection> shaky;
-    imua::generic::detectShakyParts(imu, shaky);
+    imua::generic::detectShakiness(imu, shaky);
     std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
 
     std::vector<imua::Detection> leftPans;
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
   else if (vertical=="vincent")
   {
     std::vector<imua::Detection> shaky;
-    imua::generic::detectShakyParts(imu, shaky);
+    imua::generic::detectShakiness(imu, shaky);
     std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
 
     // std::vector<imua::Detection> shaky2;

@@ -59,10 +59,10 @@ namespace imua
      * @param thresholdLow   low threshold
      * @param thresholdHigh  high threshold
      */
-    void detectShakyParts(const IMU & imu,
-                          std::vector<Detection> & detections,
-                          const float thresholdLow=1.f,
-                          const float thresholdHigh=2.f);
+    void detectShakiness(const IMU & imu,
+                         std::vector<Detection> & detections,
+                         const float thresholdLow=1.f,
+                         const float thresholdHigh=2.f);
 
     /**
      *
