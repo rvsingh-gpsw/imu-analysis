@@ -53,7 +53,6 @@ namespace imua
 
     float start;             // starting time
     float end;               // ending time
-    float climax;            // climax time
     float value;             // value for the current detection
     std::string description; // description for the current detection
 
@@ -67,13 +66,6 @@ namespace imua
               const float end,
               const float value,
               const std::string description);
-
-    Detection(const float start,
-              const float end,
-              const float climax,
-              const float value,
-              const std::string description);
-
   };
 
   /**

@@ -98,7 +98,7 @@ namespace imua
               // jump_highlight.out_time   =    jump_end*1000;
               // jump_highlight.event_type =    STR2FOURCC("JUMP");
               // highlights.push_back(jump_highlight);
-              Detection detection(jump_start, jump_end, (jump_start+jump_end)/2, height, "jump");
+              Detection detection(jump_start, jump_end, height, "jump");
               detections.push_back(detection);
 
             }
@@ -429,6 +429,75 @@ namespace imua
       }
     }
 
+
+    void detectPans(const IMU & imu,
+                    std::vector<Detection> & pans)
+    {
+
+      // Parameters
+      const float Z_MIN        = 0.4f;
+      const float Z_MAX        = 1.f;
+      const float XY_MAX       = 0.2f;
+      const float DURATION_MIN = 2.f;
+
+      // To make code lighter
+      const float * x = imu.gyro.x;
+      const float * y = imu.gyro.y;
+      const float * z = imu.gyro.z;
+      const float * t = imu.gyro.t;
+
+      // Variable for the detections
+      enum DetectionType {none, left, right};
+      DetectionType previous = none;
+      float         start    = 0.f;
+      float         end      = 0.f;
+
+      // Go through all gyroscopic values
+      for (int i=0; i<imu.gyro.size; ++i) {
+
+        // Get the type of pan
+        const bool is_left_pan  = z[i]>=Z_MIN  && z[i]<=Z_MAX;
+        const bool is_right_pan = z[i]<=-Z_MIN && z[i]>=-Z_MAX;
+        const bool is_not_noisy = std::max(std::abs(x[i]), std::abs(y[i])) <= XY_MAX;
+        DetectionType current = none;
+        if (is_left_pan && is_not_noisy)
+          current = left;
+        else if (is_right_pan && is_not_noisy)
+          current = right;
+
+        // We change the type of pan
+        if (current!=previous) {
+
+          // Write the previous pan if necessary
+          if (previous!=none && end-start>=DURATION_MIN) {
+            const std::string description = (previous==left) ? "pan left" : "pan right";
+            const float       value       = (previous==left) ? 1 : 2;
+            pans.push_back(Detection(start, end, value, description));
+          }
+
+          // Create a new type of pan
+          if (current!=none) {
+            start = t[i];
+            end   = t[i];
+          }
+        }
+        // The previous pan continues, we need to update its ending (eventually)
+        else if (current!=none) {
+          end = t[i];
+        }
+
+        // Udate the type of the previous pan
+        previous = current;
+      }
+
+      // Write the current pan if needed
+      if (previous!=none && end-start>=DURATION_MIN) {
+        const std::string description = (previous==left) ? "pan left" : "pan right";
+        const float       value       = (previous==left) ? 1 : 2;
+        pans.push_back(Detection(start, end, value, description));
+      }
+
+    }
 
   } // namespace generic
 } // namespace imua

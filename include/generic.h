@@ -54,6 +54,9 @@ namespace imua
      * structure in order to keep a simple API (but it might change). Under the low
      * threshold, the camera is not shaky. Above the high threshold, the camera
      * shakiness is strong. Between the two thresholds, the shakiness is medium.
+     * The shakiness value is stored into the "value" field of the detection:
+     *   value = 1 -> medium
+     *   value = 2 -> strong
      * @param imu            IMU structure
      * @param detections     output array that will contain detections
      * @param thresholdLow   low threshold
@@ -70,6 +73,12 @@ namespace imua
     void detectPans(const IMU & imu,
                     std::vector<Detection> & leftPans,
                     std::vector<Detection> & rightPans);
+
+    /**
+     *
+     */
+    void detectPans(const IMU & imu,
+                    std::vector<Detection> & pans);
 
   }
 }

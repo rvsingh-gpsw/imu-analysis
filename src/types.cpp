@@ -24,8 +24,7 @@ namespace imua
   Detection::Detection():
   start(0.f),
   end(0.f),
-  climax(0.f),
-  value(0.f),
+  value(1.f),
   description("Default"){}
 
 
@@ -34,8 +33,7 @@ namespace imua
                        const std::string description):
   start(start),
   end(end),
-  climax(start),
-  value(0.f),
+  value(1.f),
   description(description){}
 
 
@@ -45,19 +43,6 @@ namespace imua
                        const std::string description):
   start(start),
   end(end),
-  climax((start+end)/2),
-  value(value),
-  description(description){}
-
-
-  Detection::Detection(const float start,
-                       const float end,
-                       const float climax,
-                       const float value,
-                       const std::string description):
-  start(start),
-  end(end),
-  climax(climax),
   value(value),
   description(description){}
 
