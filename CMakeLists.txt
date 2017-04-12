@@ -30,13 +30,18 @@ set(HEADERS include/types.h
             include/mountainbiking.h
             include/surfing.h)
 
-# Create an executable using the created library
-#set(EXENAME detector)
-#add_executable(${EXENAME} main.cpp gpmf_parser.c)
-#target_link_libraries(${EXENAME} ${LIBNAME})
-
-# Indicate where to install the library, the executable and the headers
+# Indicate where to install the library and the headers
 install(TARGETS ${LIBNAME} DESTINATION lib)
-#install(TARGETS ${EXENAME} DESTINATION bin)
 install(FILES   ${HEADERS} DESTINATION include/${LIBNAME})
+
+# By default, the executable is not compiled
+set(COMPILE_EXECUTABLE OFF CACHE BOOL "Compile executable")
+
+# Create an executable using the created library and install it
+if (COMPILE_EXECUTABLE)
+    set(EXENAME detector)
+    add_executable(${EXENAME} main.cpp gpmf_parser.c)
+    target_link_libraries(${EXENAME} ${LIBNAME})
+    install(TARGETS ${EXENAME} DESTINATION bin)
+endif()
 

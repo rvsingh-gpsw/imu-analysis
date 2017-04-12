@@ -239,11 +239,9 @@ int main(int argc, char *argv[])
     imua::generic::detectShakiness(imu, shaky);
     std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
 
-    std::vector<imua::Detection> leftPans;
-    std::vector<imua::Detection> rightPans;
-    imua::generic::detectPans(imu, leftPans, rightPans);
-    std::copy(leftPans.begin(), leftPans.end(), back_inserter(detections));
-    std::copy(rightPans.begin(), rightPans.end(), back_inserter(detections));
+    std::vector<imua::Detection> pans;
+    imua::generic::detectPans(imu, pans);
+    std::copy(pans.begin(), pans.end(), back_inserter(detections));
   }
   else if (vertical=="surfing")
   {
@@ -313,13 +311,8 @@ int main(int argc, char *argv[])
     // imua::generic::detectShakiness(imu, shaky);
     // std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
 
-    // std::vector<imua::Detection> shaky2;
-    // imua::generic::detectShakyPartsNew(imu, shaky2);
-    // std::copy(shaky2.begin(), shaky2.end(), back_inserter(detections));
-
     std::vector<imua::Detection> pans;
     imua::generic::detectPans(imu, pans);
-    std::cout << "NB : " << pans.size() << std::endl;
     std::copy(pans.begin(), pans.end(), back_inserter(detections));
   }
   else

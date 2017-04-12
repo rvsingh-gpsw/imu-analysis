@@ -25,7 +25,7 @@ namespace imua
   start(0.f),
   end(0.f),
   value(1.f),
-  description("Default"){}
+  description("true"){}
 
 
   Detection::Detection(const float start,

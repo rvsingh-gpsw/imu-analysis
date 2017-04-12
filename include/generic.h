@@ -71,13 +71,6 @@ namespace imua
      *
      */
     void detectPans(const IMU & imu,
-                    std::vector<Detection> & leftPans,
-                    std::vector<Detection> & rightPans);
-
-    /**
-     *
-     */
-    void detectPans(const IMU & imu,
                     std::vector<Detection> & pans);
 
   }

@@ -7,7 +7,7 @@ namespace imua
 
 
   /**
-   *
+   * Gyroscope structure
    */
   struct Gyroscope
   {
@@ -22,7 +22,7 @@ namespace imua
   };
 
   /**
-   *
+   * Accelerometer structure
    */
   struct Accelerometer
   {
@@ -37,13 +37,14 @@ namespace imua
   };
 
   /**
-   *
+   * IMU structure
    */
   struct IMU
   {
     Gyroscope     gyro;
     Accelerometer accl;
   };
+
 
   /**
    * Detection
@@ -53,20 +54,37 @@ namespace imua
 
     float start;             // starting time
     float end;               // ending time
-    float value;             // value for the current detection
-    std::string description; // description for the current detection
+    float value;             // value, especially useful for multi-level detections
+    std::string description; // description, mainly for debugging
 
+    /**
+     * Constructor
+     */
     Detection();
 
+    /**
+     * Constructor
+     * @param start       starting time
+     * @param end         ending time
+     * @param description description
+     */
     Detection(const float start,
               const float end,
               const std::string description);
 
+    /**
+     * Constructor
+     * @param start       starting time
+     * @param end         ending time
+     * @param value       value
+     * @param description description
+     */
     Detection(const float start,
               const float end,
               const float value,
               const std::string description);
   };
+
 
   /**
    *
