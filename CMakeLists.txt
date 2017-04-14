@@ -40,7 +40,7 @@ set(COMPILE_EXECUTABLE OFF CACHE BOOL "Compile executable")
 # Create an executable using the created library and install it
 if (COMPILE_EXECUTABLE)
     set(EXENAME detector)
-    add_executable(${EXENAME} main.cpp gpmf_parser.c)
+    add_executable(${EXENAME} example/main.cpp example/gpmf_parser.c)
     target_link_libraries(${EXENAME} ${LIBNAME})
     install(TARGETS ${EXENAME} DESTINATION bin)
 endif()
