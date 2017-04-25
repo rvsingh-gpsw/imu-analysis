@@ -79,24 +79,18 @@ namespace imua
         float start_jump_thresh = average_gforce;
         float end_jump_thresh   = average_gforce;
 
-        while(gforce_lowpass[start_idx] < start_jump_thresh )
-        start_idx--;
-        while(gforce_lowpass[end_idx] < end_jump_thresh )
-        end_idx++;
+        while(gforce_lowpass[start_idx] < start_jump_thresh && start_idx>0)
+          start_idx--;
+        while(gforce_lowpass[end_idx] < end_jump_thresh && end_idx<num_samples-1)
+          end_idx++;
 
 
             //-------- get the start and end times and make a highlight
             float jump_start =  imu.accl.t[start_idx];
             float jump_end   =  imu.accl.t[end_idx];
 
-            
-        std::cout << "start_idx  : " << start_idx << std::endl;
-        std::cout << "end_idx    : " << end_idx << std::endl;
-        std::cout << "jump_start : " << jump_start << std::endl;
-        std::cout << "jump_end   : " << jump_end << std::endl << std::endl;
-
-            int minutes = (int)jump_start / 60;
-            int seconds = (int)jump_start % 60;
+            // int minutes = (int)jump_start / 60;
+            // int seconds = (int)jump_start % 60;
             float height = 0.5*9.8*( ((jump_end-jump_start)/2)*((jump_end-jump_start)/2));
 
               // std::cout << "We had a Jump at " << jump_start << " =>" <<  minutes << ":" << seconds << " for " << (jump_end-jump_start) << " seconds" << " height = " << height*3.28084  << "ft" << std::endl;
