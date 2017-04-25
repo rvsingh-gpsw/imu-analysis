@@ -84,14 +84,16 @@ namespace imua
         while(gforce_lowpass[end_idx] < end_jump_thresh )
         end_idx++;
 
-        std::cout << "start_idx  : " << start_idx << std::endl;
-        std::cout << "end_idx    : " << end_idx << std::endl;
-        std::cout << "jump_start : " << jump_start << std::endl;
-        std::cout << "jump_end   : " << jump_end << std::endl << std::endl;
 
             //-------- get the start and end times and make a highlight
             float jump_start =  imu.accl.t[start_idx];
             float jump_end   =  imu.accl.t[end_idx];
+
+            
+        std::cout << "start_idx  : " << start_idx << std::endl;
+        std::cout << "end_idx    : " << end_idx << std::endl;
+        std::cout << "jump_start : " << jump_start << std::endl;
+        std::cout << "jump_end   : " << jump_end << std::endl << std::endl;
 
             int minutes = (int)jump_start / 60;
             int seconds = (int)jump_start % 60;
