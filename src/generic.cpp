@@ -99,8 +99,10 @@ namespace imua
               // jump_highlight.out_time   =    jump_end*1000;
               // jump_highlight.event_type =    STR2FOURCC("JUMP");
               // highlights.push_back(jump_highlight);
-              Detection detection(jump_start, jump_end, height, "jump");
-              detections.push_back(detection);
+              if (detections.empty() || jump_start>detections.back().end) {
+                Detection detection(jump_start, jump_end, height, "jump");
+                detections.push_back(detection);
+              }
 
             }
             count = 0;
