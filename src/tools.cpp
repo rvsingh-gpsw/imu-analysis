@@ -75,4 +75,13 @@ namespace imua
         output[i] = alpha * output[i] + beta * output[i+1];
     }
   }
+
+
+  void SmoothArray(std::vector<float> & array,
+                   const float weight = 0.1f)
+  {
+    std::vector<float> tmp;
+    SmoothArray(array, tmp, weight);
+    std::swap(array, tmp);
+  }
 }

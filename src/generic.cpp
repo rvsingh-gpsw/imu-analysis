@@ -84,7 +84,6 @@ namespace imua
         while(gforce_lowpass[end_idx] < end_jump_thresh && end_idx<num_samples-1)
           end_idx++;
 
-
             //-------- get the start and end times and make a highlight
             float jump_start =  imu.accl.t[start_idx];
             float jump_end   =  imu.accl.t[end_idx];
@@ -103,7 +102,6 @@ namespace imua
                 Detection detection(jump_start, jump_end, height, "jump");
                 detections.push_back(detection);
               }
-
             }
             count = 0;
           }
@@ -358,77 +356,6 @@ namespace imua
 
         // Update the previous detection for next chunk
         previous_val = current_val;
-      }
-    }
-
-
-    void detectPans(const IMU & imu,
-                    std::vector<Detection> & leftPans,
-                    std::vector<Detection> & rightPans)
-    {
-
-      // Parameters
-      const float Z_MIN        = 0.4f;
-      const float Z_MAX        = 1.f;
-      const float XY_MAX       = 0.2f;
-      const float DURATION_MIN = 2.f;
-
-      // To make code lighter
-      const float * x = imu.gyro.x;
-      const float * y = imu.gyro.y;
-      const float * z = imu.gyro.z;
-      const float * t = imu.gyro.t;
-
-      // Detection properties
-      float start  = 0.f;
-      float end    = 0.f;
-
-      // Detect left pans
-      bool dip = false;
-      for (int i=0; i<imu.gyro.size; ++i) {
-        if (z[i]>=Z_MIN && z[i]<=Z_MAX && std::abs(x[i])<XY_MAX && std::abs(y[i])<XY_MAX) {
-          if (dip) {
-            end = t[i];
-          }
-          else {
-            dip   = true;
-            start = t[i];
-            end   = t[i];
-          }
-        }
-        else {
-          if (dip && end-start>=DURATION_MIN) {
-            leftPans.push_back(Detection(start, end, "left pan"));
-          }
-          dip = false;
-        }
-      }
-      if (dip && end-start>=DURATION_MIN) {
-        leftPans.push_back(Detection(start, end, "left pan"));
-      }
-
-      // Detect right pans
-      dip = false;
-      for (int i=0; i<imu.gyro.size; ++i) {
-        if (-z[i]>=Z_MIN && -z[i]<=Z_MAX && std::abs(x[i])<XY_MAX && std::abs(y[i])<XY_MAX) {
-          if (dip) {
-            end = t[i];
-          }
-          else {
-            dip   = true;
-            start = t[i];
-            end   = t[i];
-          }
-        }
-        else {
-          if (dip && end-start>=DURATION_MIN) {
-            rightPans.push_back(Detection(start, end, "right pan"));
-          }
-          dip = false;
-        }
-      }
-      if (dip && end-start>=DURATION_MIN) {
-        rightPans.push_back(Detection(start, end, "right pan"));
       }
     }
 

@@ -28,6 +28,12 @@ namespace imua
                    std::vector<float> & output,
                    const float weight = 0.1f);
 
+  /**
+   * In place smoothing.
+   */
+  void SmoothArray(const std::vector<float> & array,
+                   const float weight = 0.1f);
+
 
 
 

@@ -64,11 +64,16 @@ namespace imua
      */
     void detectShakiness(const IMU & imu,
                          std::vector<Detection> & detections,
-                         const float thresholdLow=1.f,
-                         const float thresholdHigh=2.f);
+                         const float thresholdLow=0.5f,
+                         const float thresholdHigh=1.f);
 
     /**
-     *
+     * Detect camera pans. We only detect left and right pan.
+     * The type of the pan  is stored into the "value" field of the detection:
+     *   value = 1 -> left pan
+     *   value = 2 -> right pan
+     * @param imu   IMU structure
+     * @param pans  output array that will contain detections
      */
     void detectPans(const IMU & imu,
                     std::vector<Detection> & pans);
