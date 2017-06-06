@@ -8,8 +8,7 @@ namespace imua
                    const float * y,
                    const float * z,
                    const int     n,
-                   std::vector<float> & norm)
-  {
+                   std::vector<float> & norm) {
 
     // Allocate memory
     norm.clear();
@@ -22,39 +21,10 @@ namespace imua
   }
 
 
-
-
-  void SmoothArray(const std::vector<float> & input,
+  void SmoothArray(const float        * input,
+                   const int            size,
                    std::vector<float> & output,
-                   const float weight)
-  {
-
-    // Allocate the memory
-    output.clear();
-    output.resize(input.size());
-
-    // Parameters
-    const float alpha = weight;
-    const float beta  = 1.f - weight;
-
-    // Forward smoothing
-    output[0] = input[0];
-    for (int i=1; i<input.size(); ++i) {
-        output[i] = alpha * input[i] + beta * output[i-1];
-    }
-
-    // Backward smoothing
-    for (int i=input.size()-2; i>=0; --i) {
-        output[i] = alpha * output[i] + beta * output[i+1];
-    }
-  }
-
-
-  void SmoothArray(const float * input,
-                   const int     size,
-                   std::vector<float> & output,
-                   const float weight)
-  {
+                   const float          weight) {
 
     // Allocate the memory
     output.clear();
@@ -77,9 +47,15 @@ namespace imua
   }
 
 
+  void SmoothArray(const std::vector<float> & input,
+                   std::vector<float>       & output,
+                   const float                weight) {
+    SmoothArray(&input[0], input.size, output, weight);
+  }
+
+
   void SmoothArray(std::vector<float> & array,
-                   const float weight = 0.1f)
-  {
+                   const float          weight = 0.1f) {
     std::vector<float> tmp;
     SmoothArray(array, tmp, weight);
     std::swap(array, tmp);

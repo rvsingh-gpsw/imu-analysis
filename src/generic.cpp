@@ -307,17 +307,6 @@ namespace imua
         // Compute the norm of the standard deviation
         const float norm = std::sqrt(var_x + var_y + var_z);
 
-        // // Debug string
-        // std::stringstream ss;
-        // ss << std::fixed << std::setprecision(3);
-        // ss << "variance ";
-        // ss << "x= " << std::setw(6) << var_x << " ";
-        // ss << "y= " << std::setw(6) << var_y << " ";
-        // ss << "z= " << std::setw(6) << var_z << " ";
-        // ss << "norm= " << std::setw(6) << norm;
-        // Detection detection(imu.gyro.t[start], imu.gyro.t[end], ss.str());
-        // detections.push_back(detection);
-
         // Deduce the chunk value
         if (norm<=thresholdLow)
           chunk_value[i] = 0;
