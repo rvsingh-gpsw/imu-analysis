@@ -54,7 +54,7 @@ namespace imua
    * @param array   array to smooth
    * @param weight  weight parameter
    */
-  void SmoothArray(const std::vector<float> & array,
+  void SmoothArray(std::vector<float> & array,
                    const float weight = 0.1f);
 
 

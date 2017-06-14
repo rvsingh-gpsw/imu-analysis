@@ -50,12 +50,12 @@ namespace imua
   void SmoothArray(const std::vector<float> & input,
                    std::vector<float>       & output,
                    const float                weight) {
-    SmoothArray(&input[0], input.size, output, weight);
+    SmoothArray(&input[0], input.size(), output, weight);
   }
 
 
   void SmoothArray(std::vector<float> & array,
-                   const float          weight = 0.1f) {
+                   const float          weight) {
     std::vector<float> tmp;
     SmoothArray(array, tmp, weight);
     std::swap(array, tmp);
