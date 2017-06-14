@@ -19,7 +19,7 @@ set(SOURCES src/types.cpp
 
 # Create a library
 set(LIBNAME IMUAnalysis)
-add_library(${LIBNAME} STATIC ${SOURCES})
+add_library(${LIBNAME} ${SOURCES})
 
 # Create the list of header files
 set(HEADERS include/types.h
