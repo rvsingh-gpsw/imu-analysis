@@ -59,4 +59,32 @@ namespace imua
 
 
 
+  /**
+   * Smooth an array using 3 pass box filter.
+   * The distance between 2 consecutive values in the input array is assumed to be 1.
+   * The standard deviation is to be adapted based on this assumption.
+   * @param input  input array
+   * @param output output array
+   * @param sigma  standard deviation
+   */
+  void SmoothArrayBox(const float * input,
+                      float       * output,
+                      const int     size,
+                      const float   sigma = 1.f);
+
+
+  /**
+   * Smooth an array using 3 pass box filter.
+   * The distance between 2 consecutive values in the input array is assumed to be 1.
+   * The standard deviation is to be adapted based on this assumption.
+   * @param input  input array
+   * @param output output array
+   * @param sigma  standard deviation
+   */
+  void SmoothArrayBox(const std::vector<float> & input,
+                      std::vector<float>       & output,
+                      const float                sigma = 1.f);
+
+
+
 }

@@ -6,6 +6,8 @@
 #include <sstream>
 #include <cmath>
 
+#include <fstream>
+
 
 namespace imua
 {
@@ -34,6 +36,7 @@ namespace imua
         gforce[i]  =  norm;
       }
 
+
       //put the gforce through a low pass filter
       float weight = 0.1;
       float sample = 9.8;
@@ -53,6 +56,8 @@ namespace imua
       int   state    = 0;
       int   current = 0;
       int   count   = 0;
+
+
       if( gforce_lowpass[0] < gforceThreshold) {state = 1; count++;}
       for(int i = 1; i < num_samples; i++)
       {
@@ -64,6 +69,7 @@ namespace imua
         //do some logic now, if current is below threshold this marks the end of a run
         if( (state == 1) && (current == 0))
         {
+
           if(count > threshold_samples)
           {
 
@@ -122,6 +128,135 @@ namespace imua
 
       return true;
     }
+
+
+    // bool detectJumps2(const IMU & imu,
+    //                 std::vector<Detection> & detections,
+    //                 const float threshold,
+    //                 const float durationMin)
+    // {
+
+    //   // Constants
+    //   const float threshold_max = 9.f;
+    //   const float gap_max       = 0.f;
+
+    //   // Compute and smooth the norm
+    //   std::vector<float> norm;
+    //   std::vector<float> norm_smooth;
+    //   const float sigma = imu.accl.samplingRate * 0.02f;
+    //   ComputeNorm(imu.accl.x, imu.accl.y, imu.accl.z, imu.accl.size, norm);
+    //   SmoothArrayBox(norm, norm_smooth, sigma);
+
+    //   std::vector<float> x2;
+    //   std::vector<float> y2;
+    //   std::vector<float> z2;
+    //   std::vector<float> norm_smooth2;
+    //   SmoothArray(imu.accl.x, imu.accl.size, x2, 0.1f);
+    //   SmoothArray(imu.accl.y, imu.accl.size, y2, 0.1f);
+    //   SmoothArray(imu.accl.z, imu.accl.size, z2, 0.1f);
+    //   ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth2);
+
+
+    //   std::vector<float>::iterator result = std::min_element(std::begin(norm_smooth), std::end(norm_smooth));
+    //   printf("Min = %f\n", *result);
+
+    //   float threshold_min = std::min(9.81f - (9.81f-*result)*0.9f, 5.f);
+    //   // threshold_min = threshold;
+    //   printf("Threshold = %f\n", threshold_min);
+
+    //   // DEBUG
+    //   std::ofstream ofs;
+    //   ofs.open("/Users/vincent/Desktop/output.csv");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << imu.accl.t[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << imu.accl.x[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << imu.accl.y[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << imu.accl.z[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << norm[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << norm_smooth[i] << ((i<norm.size()-1) ? "," : "\n");
+    //   for (int i=0; i<norm.size(); i++)
+    //     ofs << norm_smooth2[i] << ((i<norm.size()-1) ? "," : "");
+    //   ofs.close();
+
+    //   std::swap(norm_smooth, norm_smooth2);
+
+    //   // Variables
+    //   bool  dip     = false; // Detection in progress
+    //   float start   = 0.f;
+    //   float end     = 0.f;
+    //   float min_val = 100.f;
+    //   std::vector<Detection> array;
+
+
+    //   for (int i=0; i<imu.accl.size; ++i) {
+
+    //     // If the current point potentially belong to a jump
+    //     if (norm_smooth[i]<=threshold_max) {
+
+    //       // printf("coucou!\n");
+
+    //       // If we are already detecting a jump, we update the potential detection.
+    //       // Otherwise we create a new potential detection.
+    //       if (dip) {
+    //         end     = imu.accl.t[i];
+    //         min_val = std::min(min_val, norm_smooth[i]);
+    //       }
+    //       else {
+    //         start   = imu.accl.t[i];
+    //         end     = imu.accl.t[i];
+    //         min_val = norm_smooth[i];
+    //       }
+    //       dip = true;
+    //     }
+    //     // The potential detetion is finished, let's add it to the array
+    //     else if (dip) {
+
+    //       // It needs to be a jump based on its minimum value
+    //       if (min_val<threshold_min) {
+
+    //         // The potential detection reach the detection threshold so it is a
+    //         // detection. If it's close enough to the previous detection, we can fuse
+    //         // both detections. If it's not close enough we create a new detection.
+    //         if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
+    //             array.back().end   = end;
+    //             array.back().value = std::min(min_val, array.back().value);
+    //         }
+    //         else {
+    //             array.push_back(Detection(start, end, min_val, "jump2"));
+    //         }
+    //       }
+
+    //       // The detection is finished
+    //       dip = false;
+    //     }
+    //   }
+
+    //   // Handle if we still have a potential detection in progress
+    //   if (dip && min_val<threshold_min) {
+    //     if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
+    //         array.back().end   = end;
+    //         array.back().value = std::min(min_val, array.back().value);
+    //     }
+    //     else {
+    //         array.push_back(Detection(start, end, min_val, "jump2"));
+    //     }
+    //   }
+
+    //   // We keep only long enough detection
+    //   for (int i=0; i<array.size(); ++i) {
+    //     if (array[i].end-array[i].start>=durationMin) {
+    //       detections.push_back(array[i]);
+    //     }
+    //   }
+
+    //   return true;
+
+    // }
 
 
     //----------------------------------------------------------------------------------------------
@@ -251,13 +386,20 @@ namespace imua
                          const float thresholdLow,
                          const float thresholdHigh)
     {
+      // Sanity check
+      if (imu.gyro.size<=0 || imu.gyro.samplingRate<1.f) {
+        return;
+      }
+
       // Constants
-      const float first = imu.gyro.t[0];
-      const float last  = imu.gyro.t[imu.gyro.size-1];
-      const float freq  = imu.gyro.size / (last-first);
       const float chunk_duration = 1.f; // seconds
-      const int   chunk_size     = static_cast<int>(freq*chunk_duration);
+      const int   chunk_size     = static_cast<int>(imu.gyro.samplingRate * chunk_duration);
       const int   chunk_nb       = std::ceil(static_cast<float>(imu.gyro.size) / chunk_size);
+
+      // Sanity check
+      if (chunk_size<1 || chunk_nb<1) {
+        return;
+      }
 
       // Compute low frequencies
       std::vector<float> x_lf;

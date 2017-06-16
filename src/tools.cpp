@@ -60,4 +60,47 @@ namespace imua
     SmoothArray(array, tmp, weight);
     std::swap(array, tmp);
   }
+
+
+  void BoxFilter(const float * input,
+                 float       * output,
+                 const int     size,
+                 const int     radius) {
+
+    for (int i=0; i<size; ++i) {
+      const int start = std::max(i-radius, 0);
+      const int end   = std::min(i+radius, size-1);
+      const int nb    = end-start+1;
+      float sum = 0.f;
+      for (int j=start; j<=end; ++j) {
+        sum += input[j];
+      }
+      output[i] = sum / nb;
+    }
+  }
+
+
+  void SmoothArrayBox(const std::vector<float> & input,
+                      std::vector<float>       & output,
+                      const float                sigma) {
+
+    // Allocate memory
+    const int n = input.size();
+    output.resize(n);
+
+    // Allocate temporary buffer
+    std::vector<float> buffer(n);
+
+    // Compute kernel radius
+    const int k = 3;
+    const int r = std::ceil(std::sqrt(sigma*sigma*12/k + 1.f));
+
+    // Apply 3 times the box filter
+    BoxFilter(&input[0],  &output[0], n, r);
+    BoxFilter(&output[0], &buffer[0], n, r);
+    BoxFilter(&buffer[0], &output[0], n, r);
+    
+  }
+
+
 }
