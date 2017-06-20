@@ -16,6 +16,8 @@
 
 #include <cstring>
 
+#include <chrono>
+
 extern "C" {
   #include "gpmf_parser.h"
 }
@@ -315,13 +317,24 @@ int main(int argc, char *argv[])
     // imua::generic::detectPans(imu, pans);
     // std::copy(pans.begin(), pans.end(), back_inserter(detections));
 
+
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    std::chrono::duration<double> elapsed_seconds;
+
+    start = std::chrono::system_clock::now();
     std::vector<imua::Detection> jumps;
     imua::generic::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+    end = std::chrono::system_clock::now();
+    elapsed_seconds = end-start;
+    std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
 
-    // std::vector<imua::Detection> jumps2;
-    // imua::generic::detectJumps2(imu, jumps2);
-    // std::copy(jumps2.begin(), jumps2.end(), back_inserter(detections));
+    std::vector<imua::Detection> jumps2;
+    imua::generic::detectJumps2(imu, jumps2);
+    std::copy(jumps2.begin(), jumps2.end(), back_inserter(detections));
+    end = std::chrono::system_clock::now();
+    elapsed_seconds = end-start;
+    std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
   }
   else
   {

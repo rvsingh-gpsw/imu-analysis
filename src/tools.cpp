@@ -80,6 +80,27 @@ namespace imua
   }
 
 
+  void SmoothArrayBox(const float * input,
+                      float       * output,
+                      const int     size,
+                      const float   sigma)
+  {
+
+    // Allocate temporary buffer
+    std::vector<float> buffer(size);
+
+    // Compute kernel radius
+    const int k = 3;
+    const int r = std::ceil(std::sqrt(sigma*sigma*12/k + 1.f));
+    printf("Radius : %d\n", r);
+
+    // Apply 3 times the box filter
+    BoxFilter(input,  output,     size, r);
+    BoxFilter(output, &buffer[0], size, r);
+    BoxFilter(&buffer[0], output, size, r);
+  }
+
+
   void SmoothArrayBox(const std::vector<float> & input,
                       std::vector<float>       & output,
                       const float                sigma) {
@@ -95,6 +116,7 @@ namespace imua
     const int k = 3;
     const int r = std::ceil(std::sqrt(sigma*sigma*12/k + 1.f));
 
+ 
     // Apply 3 times the box filter
     BoxFilter(&input[0],  &output[0], n, r);
     BoxFilter(&output[0], &buffer[0], n, r);

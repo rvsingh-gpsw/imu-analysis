@@ -130,133 +130,165 @@ namespace imua
     }
 
 
-    // bool detectJumps2(const IMU & imu,
-    //                 std::vector<Detection> & detections,
-    //                 const float threshold,
-    //                 const float durationMin)
-    // {
+    bool detectJumps2(const IMU & imu,
+                    std::vector<Detection> & detections,
+                    const float threshold,
+                    const float durationMin)
+    {
 
-    //   // Constants
-    //   const float threshold_max = 9.f;
-    //   const float gap_max       = 0.f;
+      // Constants
+      const float threshold_max = 9.f;
+      const float gap_max       = durationMin / 2.f;
+      const int   size          = imu.accl.size;
 
-    //   // Compute and smooth the norm
-    //   std::vector<float> norm;
-    //   std::vector<float> norm_smooth;
-    //   const float sigma = imu.accl.samplingRate * 0.02f;
-    //   ComputeNorm(imu.accl.x, imu.accl.y, imu.accl.z, imu.accl.size, norm);
-    //   SmoothArrayBox(norm, norm_smooth, sigma);
+      // Smooth the input data
+      const float sigma = imu.accl.samplingRate * 0.02f;
+      std::vector<float> x2(size);
+      std::vector<float> y2(size);
+      std::vector<float> z2(size);
+      SmoothArrayBox(imu.accl.x, &x2[0], imu.accl.size, sigma);
+      SmoothArrayBox(imu.accl.y, &y2[0], imu.accl.size, sigma);
+      SmoothArrayBox(imu.accl.z, &z2[0], imu.accl.size, sigma);
 
-    //   std::vector<float> x2;
-    //   std::vector<float> y2;
-    //   std::vector<float> z2;
-    //   std::vector<float> norm_smooth2;
-    //   SmoothArray(imu.accl.x, imu.accl.size, x2, 0.1f);
-    //   SmoothArray(imu.accl.y, imu.accl.size, y2, 0.1f);
-    //   SmoothArray(imu.accl.z, imu.accl.size, z2, 0.1f);
-    //   ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth2);
+      // Compute the norm
+      std::vector<float> norm_smooth;
+      ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth);
 
 
-    //   std::vector<float>::iterator result = std::min_element(std::begin(norm_smooth), std::end(norm_smooth));
-    //   printf("Min = %f\n", *result);
+      // std::vector<float>::iterator result = std::min_element(std::begin(norm_smooth), std::end(norm_smooth));
+      // printf("Min = %f\n", *result);
 
-    //   float threshold_min = std::min(9.81f - (9.81f-*result)*0.9f, 5.f);
-    //   // threshold_min = threshold;
-    //   printf("Threshold = %f\n", threshold_min);
+      // float threshold_min = std::min(9.81f - (9.81f-*result)*0.9f, 5.f);
+      float threshold_min = threshold;
+      // printf("Threshold = %f\n", threshold_min);
 
-    //   // DEBUG
-    //   std::ofstream ofs;
-    //   ofs.open("/Users/vincent/Desktop/output.csv");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << imu.accl.t[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << imu.accl.x[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << imu.accl.y[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << imu.accl.z[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << norm[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << norm_smooth[i] << ((i<norm.size()-1) ? "," : "\n");
-    //   for (int i=0; i<norm.size(); i++)
-    //     ofs << norm_smooth2[i] << ((i<norm.size()-1) ? "," : "");
-    //   ofs.close();
+      // // DEBUG
+      // std::ofstream ofs;
+      // ofs.open("/Users/vincent/Desktop/output.csv");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << imu.accl.t[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << imu.accl.x[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << imu.accl.y[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << imu.accl.z[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << norm[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << norm_smooth[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << x2[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << y2[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << z2[i] << ((i<norm.size()-1) ? "," : "\n");
+      // for (int i=0; i<norm.size(); i++)
+      //   ofs << norm_smooth2[i] << ((i<norm.size()-1) ? "," : "");
+      // ofs.close();
 
-    //   std::swap(norm_smooth, norm_smooth2);
+      // DEBUG
+      std::ofstream ofs;
+      ofs.open("/Users/vincent/Desktop/output.csv");
+      for (int i=0; i<size; i++)
+        ofs << imu.accl.t[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << imu.accl.x[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << imu.accl.y[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << imu.accl.z[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << x2[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << y2[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << z2[i] << ((i<size-1) ? "," : "\n");
+      for (int i=0; i<size; i++)
+        ofs << norm_smooth[i] << ((i<size-1) ? "," : "");
+      ofs.close();
 
-    //   // Variables
-    //   bool  dip     = false; // Detection in progress
-    //   float start   = 0.f;
-    //   float end     = 0.f;
-    //   float min_val = 100.f;
-    //   std::vector<Detection> array;
+
+      // Variables
+      bool  dip     = false; // Detection in progress
+      float start   = 0.f;
+      float end     = 0.f;
+      float min_val = 100.f;
+      std::vector<Detection> array;
+
+      int nb_fusions = 0;
 
 
-    //   for (int i=0; i<imu.accl.size; ++i) {
+      for (int i=0; i<imu.accl.size; ++i) {
 
-    //     // If the current point potentially belong to a jump
-    //     if (norm_smooth[i]<=threshold_max) {
+        // If the current point potentially belong to a jump
+        if (norm_smooth[i]<=threshold_max) {
 
-    //       // printf("coucou!\n");
+          // printf("coucou!\n");
 
-    //       // If we are already detecting a jump, we update the potential detection.
-    //       // Otherwise we create a new potential detection.
-    //       if (dip) {
-    //         end     = imu.accl.t[i];
-    //         min_val = std::min(min_val, norm_smooth[i]);
-    //       }
-    //       else {
-    //         start   = imu.accl.t[i];
-    //         end     = imu.accl.t[i];
-    //         min_val = norm_smooth[i];
-    //       }
-    //       dip = true;
-    //     }
-    //     // The potential detetion is finished, let's add it to the array
-    //     else if (dip) {
+          // If we are already detecting a jump, we update the potential detection.
+          // Otherwise we create a new potential detection.
+          if (dip) {
+            end     = imu.accl.t[i];
+            min_val = std::min(min_val, norm_smooth[i]);
+          }
+          else {
+            start   = imu.accl.t[i];
+            end     = imu.accl.t[i];
+            min_val = norm_smooth[i];
+          }
+          dip = true;
+        }
+        // The potential detetion is finished, let's add it to the array
+        else if (dip) {
 
-    //       // It needs to be a jump based on its minimum value
-    //       if (min_val<threshold_min) {
+          // It needs to be a jump based on its minimum value
+          if (min_val<threshold_min) {
 
-    //         // The potential detection reach the detection threshold so it is a
-    //         // detection. If it's close enough to the previous detection, we can fuse
-    //         // both detections. If it's not close enough we create a new detection.
-    //         if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
-    //             array.back().end   = end;
-    //             array.back().value = std::min(min_val, array.back().value);
-    //         }
-    //         else {
-    //             array.push_back(Detection(start, end, min_val, "jump2"));
-    //         }
-    //       }
+            // The potential detection reach the detection threshold so it is a
+            // detection. If it's close enough to the previous detection, we can fuse
+            // both detections. If it's not close enough we create a new detection.
+            if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
+                printf("Gap = %f\n", start-array.back().end);
+                array.back().end   = end;
+                array.back().value = std::min(min_val, array.back().value);
+                nb_fusions++;
+            }
+            else {
+                array.push_back(Detection(start, end, min_val, "jump2"));
+            }
+          }
 
-    //       // The detection is finished
-    //       dip = false;
-    //     }
-    //   }
+          // The detection is finished
+          dip = false;
+        }
+      }
 
-    //   // Handle if we still have a potential detection in progress
-    //   if (dip && min_val<threshold_min) {
-    //     if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
-    //         array.back().end   = end;
-    //         array.back().value = std::min(min_val, array.back().value);
-    //     }
-    //     else {
-    //         array.push_back(Detection(start, end, min_val, "jump2"));
-    //     }
-    //   }
+      // Handle if we still have a potential detection in progress
+      if (dip && min_val<threshold_min) {
+        if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
+                printf("Gap = %f\n", start-array.back().end);
+            array.back().end   = end;
+            array.back().value = std::min(min_val, array.back().value);
+            nb_fusions++;
+        }
+        else {
+            array.push_back(Detection(start, end, min_val, "jump2"));
+        }
+      }
 
-    //   // We keep only long enough detection
-    //   for (int i=0; i<array.size(); ++i) {
-    //     if (array[i].end-array[i].start>=durationMin) {
-    //       detections.push_back(array[i]);
-    //     }
-    //   }
+      // We keep only long enough detection
+      for (int i=0; i<array.size(); ++i) {
+        if (array[i].end-array[i].start>=durationMin) {
+          detections.push_back(array[i]);
+        }
+      }
 
-    //   return true;
+      printf("Nb fusions : %d\n", nb_fusions);
 
-    // }
+      return true;
+
+    }
 
 
     //----------------------------------------------------------------------------------------------
