@@ -22,9 +22,7 @@ namespace imua
                      const float hangetimeThreshold = 0.25f);
 
     bool detectJumps2(const IMU & imu,
-                      std::vector<Detection> & detections,
-                      const float threshold   = 5.f,
-                      const float durationMin = 0.25f);
+                      std::vector<Detection> & detections);
 
     /**
      *

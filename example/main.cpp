@@ -123,8 +123,12 @@ void exportSubtitles(const std::string & path, const std::string & vertical, con
           srtFile << i+1 << std::endl;
           srtFile << timeAsString(detections[i].start) << " --> " << timeAsString(detections[i].end) << std::endl;
           srtFile << std::fixed;
-          srtFile << "<font color=\"#00FF00\">" << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << "</font>" << std::endl;
-          // srtFile << vertical << " : " << detections[i].description << " for " << std::setprecision(2) << detections[i].end-detections[i].start << " s" << std::endl;
+          srtFile << "<font color=\"#00FF00\">";
+          srtFile << detections[i].description;
+          srtFile << " t= " << std::setprecision(2) << detections[i].end-detections[i].start << " s ";
+          srtFile << " g= " << std::setprecision(2) << detections[i].value;
+          srtFile << " r= " << (detections[i].end-detections[i].start) / detections[i].value;
+          srtFile << "</font>" << std::endl;
           srtFile << std::endl;
       }
       srtFile.close();
@@ -317,24 +321,13 @@ int main(int argc, char *argv[])
     // imua::generic::detectPans(imu, pans);
     // std::copy(pans.begin(), pans.end(), back_inserter(detections));
 
-
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    std::chrono::duration<double> elapsed_seconds;
-
-    start = std::chrono::system_clock::now();
-    std::vector<imua::Detection> jumps;
-    imua::generic::detectJumps(imu, jumps);
-    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
-    end = std::chrono::system_clock::now();
-    elapsed_seconds = end-start;
-    std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
+    // std::vector<imua::Detection> jumps;
+    // imua::generic::detectJumps(imu, jumps);
+    // std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
 
     std::vector<imua::Detection> jumps2;
     imua::generic::detectJumps2(imu, jumps2);
     std::copy(jumps2.begin(), jumps2.end(), back_inserter(detections));
-    end = std::chrono::system_clock::now();
-    elapsed_seconds = end-start;
-    std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
   }
   else
   {

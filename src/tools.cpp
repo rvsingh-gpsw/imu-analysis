@@ -92,7 +92,6 @@ namespace imua
     // Compute kernel radius
     const int k = 3;
     const int r = std::ceil(std::sqrt(sigma*sigma*12/k + 1.f));
-    printf("Radius : %d\n", r);
 
     // Apply 3 times the box filter
     BoxFilter(input,  output,     size, r);

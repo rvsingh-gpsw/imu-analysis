@@ -131,163 +131,153 @@ namespace imua
 
 
     bool detectJumps2(const IMU & imu,
-                    std::vector<Detection> & detections,
-                    const float threshold,
-                    const float durationMin)
+                    std::vector<Detection> & detections)
     {
 
-      // Constants
-      const float threshold_max = 9.f;
-      const float gap_max       = durationMin / 2.f;
-      const int   size          = imu.accl.size;
 
-      // Smooth the input data
-      const float sigma = imu.accl.samplingRate * 0.02f;
-      std::vector<float> x2(size);
-      std::vector<float> y2(size);
-      std::vector<float> z2(size);
-      SmoothArrayBox(imu.accl.x, &x2[0], imu.accl.size, sigma);
-      SmoothArrayBox(imu.accl.y, &y2[0], imu.accl.size, sigma);
-      SmoothArrayBox(imu.accl.z, &z2[0], imu.accl.size, sigma);
+      // Parameters
+      const float threshold_norm_min = 4.f;
+      const float threshold_norm_max = 9.f;
+      const float threshold_dur_min  = 0.25f;
 
-      // Compute the norm
-      std::vector<float> norm_smooth;
-      ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth);
+      // This part allocate memory and may throw an exception. Let's protect it with a try-catch.
+      try {
 
+        // Smooth the input data
+        const int   size  = imu.accl.size;
+        const float sigma = imu.accl.samplingRate * 0.02f;
+        std::vector<float> x2(size);
+        std::vector<float> y2(size);
+        std::vector<float> z2(size);
+        SmoothArrayBox(imu.accl.x, &x2[0], imu.accl.size, sigma);
+        SmoothArrayBox(imu.accl.y, &y2[0], imu.accl.size, sigma);
+        SmoothArrayBox(imu.accl.z, &z2[0], imu.accl.size, sigma);
 
-      // std::vector<float>::iterator result = std::min_element(std::begin(norm_smooth), std::end(norm_smooth));
-      // printf("Min = %f\n", *result);
+        // Compute the norm
+        std::vector<float> norm_smooth;
+        ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth);
 
-      // float threshold_min = std::min(9.81f - (9.81f-*result)*0.9f, 5.f);
-      float threshold_min = threshold;
-      // printf("Threshold = %f\n", threshold_min);
+        // // DEBUG
+        // std::ofstream ofs;
+        // ofs.open("/Users/vincent/Desktop/output.csv");
+        // for (int i=0; i<size; i++)
+        //   ofs << imu.accl.t[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << imu.accl.x[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << imu.accl.y[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << imu.accl.z[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << x2[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << y2[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << z2[i] << ((i<size-1) ? "," : "\n");
+        // for (int i=0; i<size; i++)
+        //   ofs << norm_smooth[i] << ((i<size-1) ? "," : "");
+        // ofs.close();
 
-      // // DEBUG
-      // std::ofstream ofs;
-      // ofs.open("/Users/vincent/Desktop/output.csv");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << imu.accl.t[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << imu.accl.x[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << imu.accl.y[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << imu.accl.z[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << norm[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << norm_smooth[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << x2[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << y2[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << z2[i] << ((i<norm.size()-1) ? "," : "\n");
-      // for (int i=0; i<norm.size(); i++)
-      //   ofs << norm_smooth2[i] << ((i<norm.size()-1) ? "," : "");
-      // ofs.close();
+         // Variables
+        bool  dip     = false; // Detection in progress
+        float start   = 0.f;
+        float end     = 0.f;
+        float val     = 0.f;
+        // std::vector<Detection> array;
 
-      // DEBUG
-      std::ofstream ofs;
-      ofs.open("/Users/vincent/Desktop/output.csv");
-      for (int i=0; i<size; i++)
-        ofs << imu.accl.t[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << imu.accl.x[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << imu.accl.y[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << imu.accl.z[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << x2[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << y2[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << z2[i] << ((i<size-1) ? "," : "\n");
-      for (int i=0; i<size; i++)
-        ofs << norm_smooth[i] << ((i<size-1) ? "," : "");
-      ofs.close();
+        // Go through the values
+        for (int i=0; i<size; ++i) {
 
+          // If the current point potentially belong to a jump
+          if (norm_smooth[i]<=threshold_norm_max) {
 
-      // Variables
-      bool  dip     = false; // Detection in progress
-      float start   = 0.f;
-      float end     = 0.f;
-      float min_val = 100.f;
-      std::vector<Detection> array;
-
-      int nb_fusions = 0;
-
-
-      for (int i=0; i<imu.accl.size; ++i) {
-
-        // If the current point potentially belong to a jump
-        if (norm_smooth[i]<=threshold_max) {
-
-          // printf("coucou!\n");
-
-          // If we are already detecting a jump, we update the potential detection.
-          // Otherwise we create a new potential detection.
-          if (dip) {
-            end     = imu.accl.t[i];
-            min_val = std::min(min_val, norm_smooth[i]);
-          }
-          else {
-            start   = imu.accl.t[i];
-            end     = imu.accl.t[i];
-            min_val = norm_smooth[i];
-          }
-          dip = true;
-        }
-        // The potential detetion is finished, let's add it to the array
-        else if (dip) {
-
-          // It needs to be a jump based on its minimum value
-          if (min_val<threshold_min) {
-
-            // The potential detection reach the detection threshold so it is a
-            // detection. If it's close enough to the previous detection, we can fuse
-            // both detections. If it's not close enough we create a new detection.
-            if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
-                printf("Gap = %f\n", start-array.back().end);
-                array.back().end   = end;
-                array.back().value = std::min(min_val, array.back().value);
-                nb_fusions++;
+            // If we are already detecting a jump, we update the potential detection.
+            // Otherwise we create a new potential detection.
+            if (dip) {
+              end = imu.accl.t[i];
+              val = std::min(val, norm_smooth[i]);
             }
             else {
-                array.push_back(Detection(start, end, min_val, "jump2"));
+              start = imu.accl.t[i];
+              end   = imu.accl.t[i];
+              val   = norm_smooth[i];
             }
+            dip = true;
           }
+          // The potential detetion is finished, let's add it to the array
+          else if (dip) {
 
-          // The detection is finished
-          dip = false;
+            // Add a detection 
+            if (val<=threshold_norm_min && end-start>=threshold_dur_min) {
+              detections.push_back(Detection(start, end, val, "jump2"));
+            }
+
+            // The detection is finished
+            dip = false;
+          }
         }
+
+        // Handle if we still have a potential detection in progress
+        if (dip && val<=threshold_norm_min && end-start>=threshold_dur_min) {
+          detections.push_back(Detection(start, end, val, "jump2"));
+        }
+
+        // If no jumps has been detected, no need to filter them
+        if (detections.empty())
+          return true;
+
+        // Find the minimum norm value and the maximum duration
+        float min_val = 100.f;
+        float max_dur = 0.f;
+        for (int i=0; i<detections.size(); ++i) {
+          min_val = std::min(min_val, detections[i].value);
+          max_dur = std::max(max_dur, detections[i].end-detections[i].start);
+        }
+
+
+        // // Compute relative threshold for norm and duration
+        // printf("Min val = %f\n", min_val);
+        // printf("Max dur = %f\n", max_dur);
+        // // const float threshold_norm_min_relative = (threshold_norm_min+min_val) / 2.f;
+        // // const float threshold_dur_min_relative  = (threshold_dur_min+max_dur) / 2.f;
+
+        // // Compute the threshold on the norm
+        // // min_val = 0                 -> t_n = 3
+        // // min_val = threshold_dur_min -> t_n = threshold_dur_min 
+        // float t_n = (threshold_norm_min-4.f) * min_val / threshold_norm_min + 4.f;
+        // t_n = std::max(4.f, std::min(threshold_norm_min,  t_n) );
+        // t_n = threshold_norm_min;
+
+        // // Compute the threshold on the duration
+        // // max_dur = threshold_dur_min -> t_d = threshold_dur_min
+        // // max_dur = 2                 -> t_d = 1
+        // float t_d = (0.5f-threshold_dur_min) * max_dur / (2.f-threshold_dur_min) + threshold_dur_min / (2.f-threshold_dur_min);
+        // t_d = std::max(threshold_dur_min, std::min(0.5f,  t_d) );
+
+        // t_n = 3.f;
+        // t_d = 0.33f;
+
+        // printf("Threshold val = %f\n", t_n);
+        // printf("Threshold dur = %f\n", t_d);
+
+        // // We keep only good enough jumps
+        // for (int i=0; i<array.size(); ++i) {
+        //   Detection & d = array[i];
+        //   // const float score_dur = (d.end-d.start) / 2.f; // dur = 0s -> score = 0, dur=2s -> score = 1
+        //   // const float score_val = (9.81-d.value) / 9.81; // val = 9.81 -> score =0, val=0 -> score = 1
+        //   // d.value = score_dur + score_val;
+        //   detections.push_back(d);
+        //   // if (detections.back().value>t_n || detections.back().end-detections.back().start<t_d)
+        //   //   detections.back().description = "REJECTED";
+        // }
+
       }
-
-      // Handle if we still have a potential detection in progress
-      if (dip && min_val<threshold_min) {
-        if (!array.empty() && std::abs(start-array.back().end)<=gap_max) {
-                printf("Gap = %f\n", start-array.back().end);
-            array.back().end   = end;
-            array.back().value = std::min(min_val, array.back().value);
-            nb_fusions++;
-        }
-        else {
-            array.push_back(Detection(start, end, min_val, "jump2"));
-        }
-      }
-
-      // We keep only long enough detection
-      for (int i=0; i<array.size(); ++i) {
-        if (array[i].end-array[i].start>=durationMin) {
-          detections.push_back(array[i]);
-        }
-      }
-
-      printf("Nb fusions : %d\n", nb_fusions);
+      catch (...) {
+        std::cerr << "Exception caught in jump detector" << std::endl;
+        return false;
+      } 
 
       return true;
-
     }
 
 
