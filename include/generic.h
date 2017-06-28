@@ -52,25 +52,6 @@ namespace imua
                        const int threshold_samples = 300);
 
     /**
-     * Detect shaky parts in videos. Two levels of shakiness are computed: medium
-     * and strong. The level is indicated in the description field of the detection
-     * structure in order to keep a simple API (but it might change). Under the low
-     * threshold, the camera is not shaky. Above the high threshold, the camera
-     * shakiness is strong. Between the two thresholds, the shakiness is medium.
-     * The shakiness value is stored into the "value" field of the detection:
-     *   value = 1 -> medium
-     *   value = 2 -> strong
-     * @param imu            IMU structure
-     * @param detections     output array that will contain detections
-     * @param thresholdLow   low threshold
-     * @param thresholdHigh  high threshold
-     */
-    void detectShakiness(const IMU & imu,
-                         std::vector<Detection> & detections,
-                         const float thresholdLow=0.5f,
-                         const float thresholdHigh=1.f);
-
-    /**
      * Detect camera pans. We only detect left and right pan.
      * The type of the pan  is stored into the "value" field of the detection:
      *   value = 1 -> left pan
