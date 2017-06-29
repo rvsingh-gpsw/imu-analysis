@@ -51,16 +51,5 @@ namespace imua
                        const float threshold_spin_degrees=20.f,
                        const int threshold_samples = 300);
 
-    /**
-     * Detect camera pans. We only detect left and right pan.
-     * The type of the pan  is stored into the "value" field of the detection:
-     *   value = 1 -> left pan
-     *   value = 2 -> right pan
-     * @param imu   IMU structure
-     * @param pans  output array that will contain detections
-     */
-    void detectPans(const IMU & imu,
-                    std::vector<Detection> & pans);
-
   }
 }
