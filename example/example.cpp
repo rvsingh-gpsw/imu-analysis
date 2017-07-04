@@ -62,23 +62,6 @@ void displayDetections(const std::string & vertical, const std::vector<imua::Det
   for (size_t i=0; i<detections.size(); ++i)
   {
     const imua::Detection & det = detections[i];
-    // std::cout << "  " << vertical << "->" << det.description;
-    // std::cout << " for " << std::fixed;
-    // std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
-    // std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
-    // std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
-    // std::cout << std::endl;
-
-
-    // std::cout << std::setw(20) << std::left << vertical;
-    // std::cout << std::setw(20) << det.description;
-    // std::cout << " for " << std::fixed;
-    // std::cout << std::setprecision(1) << std::setw(6) << det.end-det.start << " s : ";;
-    // std::cout << std::setprecision(1) << std::setw(6) << det.start << " -> ";
-    // std::cout << std::setprecision(1) << std::setw(6) << det.end << "";
-    // std::cout << std::endl;
-
-    // printf("%-15s %-10s start : %6.1f end : %6.1f duration : %6.1f\n", vertical.c_str(), det.description.c_str(), det.start, det.end, det.end-det.start);
     printf("%-15s %-10s %f %7.2f -> %7.2f = %7.2f seconds\n", vertical.c_str(), det.description.c_str(), det.value, det.start, det.end, det.end-det.start);
   }
 }
@@ -305,14 +288,9 @@ int main(int argc, char *argv[])
   }
   else if (vertical=="vincent")
   {
-
-    // std::vector<imua::Detection> jumps;
-    // imua::generic::detectJumps(imu, jumps);
-    // std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
-
-    std::vector<imua::Detection> jumps2;
-    imua::generic::detectJumps2(imu, jumps2);
-    std::copy(jumps2.begin(), jumps2.end(), back_inserter(detections));
+    std::vector<imua::Detection> jumps;
+    imua::generic::detectJumps(imu, jumps);
+    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
   }
   else
   {

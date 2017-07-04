@@ -14,127 +14,10 @@ namespace imua
   namespace generic
   {
 
-
-    bool detectJumps(const IMU & imu,
-                    std::vector<Detection> & detections,
-                    const float gforceThreshold,
-                    const float hangetimeThreshold)
-    {
-
-      // std::cout << "In the jump detector \n";
-      int num_samples = imu.accl.size;
-      // std::cout << "num_samples = " <<  num_samples << std::endl;
-
-      //Get the norm of the acceleration
-      float * gforce          = new float[num_samples];    if( gforce         == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}
-      float * gforce_lowpass  = new float[num_samples];    if( gforce_lowpass == NULL) { std::cout << "could not allocate memory and will exit\n"; return false;}    //bigger than it needs to be
-
-      //get the norm of acceleration
-      for(int i = 0; i < num_samples; i++)
-      {
-        double norm  =  sqrt(imu.accl.x[i]*imu.accl.x[i] + imu.accl.y[i]*imu.accl.y[i] + imu.accl.z[i]*imu.accl.z[i]);
-        gforce[i]  =  norm;
-      }
-
-
-      //put the gforce through a low pass filter
-      float weight = 0.1;
-      float sample = 9.8;
-      float average_gforce = 0;
-      for(int i = 0; i < num_samples; i++)
-      {
-        sample = weight*gforce[i] + (1-weight)*sample;
-        gforce_lowpass[i] = sample;
-         average_gforce += sample;
-      }
-
-      average_gforce /= num_samples;
-      // printf("The average gforce is %f\n", average_gforce);
-
-      //get approximately how many samples hangtime is
-      float threshold_samples = hangetimeThreshold*imu.accl.samplingRate;
-      int   state    = 0;
-      int   current = 0;
-      int   count   = 0;
-
-
-      if( gforce_lowpass[0] < gforceThreshold) {state = 1; count++;}
-      for(int i = 1; i < num_samples; i++)
-      {
-        if( gforce_lowpass[i] < gforceThreshold)
-        current = 1;  //true
-        else
-        current = 0;
-
-        //do some logic now, if current is below threshold this marks the end of a run
-        if( (state == 1) && (current == 0))
-        {
-
-          if(count > threshold_samples)
-          {
-
-            // Tune the jump !!!
-            //OK, we should find where we start the jump and really end the jump
-            //we should find the gravity crossings and label them as start and finish
-            int start_idx = i-count;
-            int   end_idx = i;
-
-
-       //------------------THIS IS TUNING THE JUMP FOR TAKE OF AND LANDING
-
-        float start_jump_thresh = average_gforce;
-        float end_jump_thresh   = average_gforce;
-
-        while(gforce_lowpass[start_idx] < start_jump_thresh && start_idx>0)
-          start_idx--;
-        while(gforce_lowpass[end_idx] < end_jump_thresh && end_idx<num_samples-1)
-          end_idx++;
-
-            //-------- get the start and end times and make a highlight
-            float jump_start =  imu.accl.t[start_idx];
-            float jump_end   =  imu.accl.t[end_idx];
-
-            // int minutes = (int)jump_start / 60;
-            // int seconds = (int)jump_start % 60;
-            float height = 0.5*9.8*( ((jump_end-jump_start)/2)*((jump_end-jump_start)/2));
-
-              // std::cout << "We had a Jump at " << jump_start << " =>" <<  minutes << ":" << seconds << " for " << (jump_end-jump_start) << " seconds" << " height = " << height*3.28084  << "ft" << std::endl;
-              // high_light jump_highlight;
-              // jump_highlight.in_time    =    jump_start*1000;
-              // jump_highlight.out_time   =    jump_end*1000;
-              // jump_highlight.event_type =    STR2FOURCC("JUMP");
-              // highlights.push_back(jump_highlight);
-              if (detections.empty() || jump_start>detections.back().end) {
-                Detection detection(jump_start, jump_end, height, "jump");
-                detections.push_back(detection);
-              }
-            }
-            count = 0;
-          }
-         else if (current == 1)
-         {
-           count++;
-         }
-         else; //no run
-
-         //store for next interation
-         state = current;
-
-       }
-
-      //dealocate the memory
-      delete[](gforce);
-      delete[](gforce_lowpass);
-
-      return true;
-    }
-
-
-    bool detectJumps2(const IMU              & imu,
-                      std::vector<Detection> & detections,
-                      const float              thresholdNorm,
-                      const float              durationMin)
-    {
+    bool detectJumps(const IMU              & imu,
+                     std::vector<Detection> & detections,
+                     const float              thresholdNorm,
+                     const float              durationMin) {
 
 
       // Parameters
@@ -164,7 +47,6 @@ namespace imua
         float start   = 0.f;
         float end     = 0.f;
         float val     = 0.f;
-        // std::vector<Detection> array;
 
         // Go through the values
         for (int i=0; i<size; ++i) {
@@ -214,43 +96,6 @@ namespace imua
           min_val = std::min(min_val, detections[i].value);
           max_dur = std::max(max_dur, detections[i].end-detections[i].start);
         }
-
-
-        // // Compute relative threshold for norm and duration
-        // printf("Min val = %f\n", min_val);
-        // printf("Max dur = %f\n", max_dur);
-        // // const float threshold_norm_min_relative = (threshold_norm_min+min_val) / 2.f;
-        // // const float threshold_dur_min_relative  = (threshold_dur_min+max_dur) / 2.f;
-
-        // // Compute the threshold on the norm
-        // // min_val = 0                 -> t_n = 3
-        // // min_val = threshold_dur_min -> t_n = threshold_dur_min 
-        // float t_n = (threshold_norm_min-4.f) * min_val / threshold_norm_min + 4.f;
-        // t_n = std::max(4.f, std::min(threshold_norm_min,  t_n) );
-        // t_n = threshold_norm_min;
-
-        // // Compute the threshold on the duration
-        // // max_dur = threshold_dur_min -> t_d = threshold_dur_min
-        // // max_dur = 2                 -> t_d = 1
-        // float t_d = (0.5f-threshold_dur_min) * max_dur / (2.f-threshold_dur_min) + threshold_dur_min / (2.f-threshold_dur_min);
-        // t_d = std::max(threshold_dur_min, std::min(0.5f,  t_d) );
-
-        // t_n = 3.f;
-        // t_d = 0.33f;
-
-        // printf("Threshold val = %f\n", t_n);
-        // printf("Threshold dur = %f\n", t_d);
-
-        // // We keep only good enough jumps
-        // for (int i=0; i<array.size(); ++i) {
-        //   Detection & d = array[i];
-        //   // const float score_dur = (d.end-d.start) / 2.f; // dur = 0s -> score = 0, dur=2s -> score = 1
-        //   // const float score_val = (9.81-d.value) / 9.81; // val = 9.81 -> score =0, val=0 -> score = 1
-        //   // d.value = score_dur + score_val;
-        //   detections.push_back(d);
-        //   // if (detections.back().value>t_n || detections.back().end-detections.back().start<t_d)
-        //   //   detections.back().description = "REJECTED";
-        // }
 
       }
       catch (...) {

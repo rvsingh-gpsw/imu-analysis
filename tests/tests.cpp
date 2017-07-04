@@ -47,10 +47,8 @@ bool TestComputeNorm() {
 
         // Verify that the output array only has 0.
         for (int i=0; i<size; ++i)
-          if (norm[i]<std::sqrt(300.)-0.00001f || norm[i]>std::sqrt(300.)+0.00001f) {
-            printf("%f\n", norm[i]);
+          if (norm[i]<std::sqrt(300.)-0.00001f || norm[i]>std::sqrt(300.)+0.00001f)
             return false;
-        }
     }
 
     return true;
