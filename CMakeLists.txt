@@ -1,5 +1,5 @@
 # Project name
-project(IMUA)
+project(IMUANALYSIS)
 
 # CMake minimum version
 cmake_minimum_required (VERSION 2.8.11)
@@ -36,12 +36,7 @@ install(FILES   ${HEADERS} DESTINATION include/${LIBNAME})
 
 # By default, the executable is not compiled
 set(COMPILE_EXECUTABLE OFF CACHE BOOL "Compile executable")
-
-# Create an executable using the created library and install it
-if (COMPILE_EXECUTABLE)
-    set(EXENAME detector)
-    add_executable(${EXENAME} example/main.cpp example/gpmf_parser.c)
-    target_link_libraries(${EXENAME} ${LIBNAME})
-    install(TARGETS ${EXENAME} DESTINATION bin)
-endif()
-
+#if (COMPILE_EXECUTABLE)
+    add_subdirectory(example)
+    add_subdirectory(tests)
+#endif()

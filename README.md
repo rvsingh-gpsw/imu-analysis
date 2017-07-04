@@ -16,7 +16,7 @@ This library provide detectors for fine grained action.
 
 This will generate the libIMUAnalysis.a file.
 
-## Compile the library and the executable
+## Compile the library, the executable and the tests
 
 ```
 > mkdir build
@@ -25,11 +25,17 @@ This will generate the libIMUAnalysis.a file.
 > make
 ```
 
-This will generate the detector executable.
-To use the executable, use the command line
+This will generate the example and the tests executables.
+To use example, use the command line
 
 ```
-./detector generic path_to_video_file.mp4
+example/example generic path_to_video_file.mp4
+```
+
+To use example, use the command line
+
+```
+tests/tests
 ```
 
 

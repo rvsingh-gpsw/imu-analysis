@@ -130,15 +130,17 @@ namespace imua
     }
 
 
-    bool detectJumps2(const IMU & imu,
-                    std::vector<Detection> & detections)
+    bool detectJumps2(const IMU              & imu,
+                      std::vector<Detection> & detections,
+                      const float              thresholdNorm,
+                      const float              durationMin)
     {
 
 
       // Parameters
-      const float threshold_norm_min = 4.f;
+      const float threshold_norm_min = thresholdNorm;
       const float threshold_norm_max = 9.f;
-      const float threshold_dur_min  = 0.25f;
+      const float threshold_dur_min  = durationMin;
 
       // This part allocate memory and may throw an exception. Let's protect it with a try-catch.
       try {
@@ -149,34 +151,13 @@ namespace imua
         std::vector<float> x2(size);
         std::vector<float> y2(size);
         std::vector<float> z2(size);
-        SmoothArrayBox(imu.accl.x, &x2[0], imu.accl.size, sigma);
-        SmoothArrayBox(imu.accl.y, &y2[0], imu.accl.size, sigma);
-        SmoothArrayBox(imu.accl.z, &z2[0], imu.accl.size, sigma);
+        SmoothArrayBoxFilter(imu.accl.x, imu.accl.size, &x2[0], sigma);
+        SmoothArrayBoxFilter(imu.accl.y, imu.accl.size, &y2[0], sigma);
+        SmoothArrayBoxFilter(imu.accl.z, imu.accl.size, &z2[0], sigma);
 
         // Compute the norm
-        std::vector<float> norm_smooth;
-        ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, norm_smooth);
-
-        // // DEBUG
-        // std::ofstream ofs;
-        // ofs.open("/Users/vincent/Desktop/output.csv");
-        // for (int i=0; i<size; i++)
-        //   ofs << imu.accl.t[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << imu.accl.x[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << imu.accl.y[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << imu.accl.z[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << x2[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << y2[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << z2[i] << ((i<size-1) ? "," : "\n");
-        // for (int i=0; i<size; i++)
-        //   ofs << norm_smooth[i] << ((i<size-1) ? "," : "");
-        // ofs.close();
+        std::vector<float> norm_smooth(size);
+        ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, &norm_smooth[0]);
 
          // Variables
         bool  dip     = false; // Detection in progress
