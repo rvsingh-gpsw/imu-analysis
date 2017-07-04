@@ -36,7 +36,7 @@ install(FILES   ${HEADERS} DESTINATION include/${LIBNAME})
 
 # By default, the executable is not compiled
 set(COMPILE_EXECUTABLE OFF CACHE BOOL "Compile executable")
-#if (COMPILE_EXECUTABLE)
+if (COMPILE_EXECUTABLE)
     add_subdirectory(example)
     add_subdirectory(tests)
-#endif()
+endif()

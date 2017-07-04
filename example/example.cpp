@@ -16,8 +16,6 @@
 
 #include <cstring>
 
-#include <chrono>
-
 extern "C" {
   #include "gpmf_parser.h"
 }
