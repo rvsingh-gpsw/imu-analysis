@@ -25,6 +25,7 @@ namespace imua
       const float threshold_norm_max = 9.f;
       const float threshold_dur_min  = durationMin;
 
+
       // This part allocate memory and may throw an exception. Let's protect it with a try-catch.
       try {
 
@@ -34,13 +35,19 @@ namespace imua
         std::vector<float> x2(size);
         std::vector<float> y2(size);
         std::vector<float> z2(size);
-        SmoothArrayBoxFilter(imu.accl.x, imu.accl.size, &x2[0], sigma);
-        SmoothArrayBoxFilter(imu.accl.y, imu.accl.size, &y2[0], sigma);
-        SmoothArrayBoxFilter(imu.accl.z, imu.accl.size, &z2[0], sigma);
+        bool result = true;
+        result &= SmoothArrayBoxFilter(imu.accl.x, imu.accl.size, &x2[0], sigma);
+        result &= SmoothArrayBoxFilter(imu.accl.y, imu.accl.size, &y2[0], sigma);
+        result &= SmoothArrayBoxFilter(imu.accl.z, imu.accl.size, &z2[0], sigma);
+
+        // Exit if we cannot smooth the data
+        if (!result)
+          return false;
 
         // Compute the norm
         std::vector<float> norm_smooth(size);
-        ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, &norm_smooth[0]);
+        if (!ComputeNorm(&x2[0], &y2[0], &z2[0], imu.accl.size, &norm_smooth[0]))
+          return false;
 
          // Variables
         bool  dip     = false; // Detection in progress

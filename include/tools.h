@@ -12,8 +12,9 @@ namespace imua
      * @param z     third array
      * @param size  number of value in the input / output arrays
      * @param norm  output array
+     * @return true if everything is fine, false otherwise
      */
-    void ComputeNorm(const float * x,
+    bool ComputeNorm(const float * x,
                      const float * y,
                      const float * z,
                      const int     size,
@@ -27,8 +28,9 @@ namespace imua
      * @param size    number of value in the input / output arrays
      * @param output  output array
      * @param weight  weight parameter
+     * @return true if everything is fine, false otherwise
      */
-    void SmoothArrayStream(const float * input,
+    bool SmoothArrayStream(const float * input,
                            const int     size,
                            float       * output,
                            const float   weight = 0.1f);
@@ -41,8 +43,9 @@ namespace imua
      * @param size   number of value in the input / output arrays
      * @param output output array
      * @param sigma  standard deviation
+     * @return true if everything is fine, false otherwise
      */
-    void SmoothArrayBoxFilter(const float * input,
+    bool SmoothArrayBoxFilter(const float * input,
                               const int     size,
                               float       * output,
                               const float   sigma = 1.f);

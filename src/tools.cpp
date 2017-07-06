@@ -35,21 +35,46 @@ namespace imua
 {
 
 
-    void ComputeNorm(const float * x,
+    bool ComputeNorm(const float * x,
                      const float * y,
                      const float * z,
                      const int     size,
-                     float       * norm) {      
+                     float       * norm) {
+
+        // Sanity check
+        if (size<1)
+          return false;
+
+        // Sanity check
+        if (x==NULL || y==NULL || z==NULL || norm==NULL)
+          return false;
+
+        // Compute Euclidean norm
         for (int i=0; i<size; ++i) {
             norm[i] = std::sqrt(x[i]*x[i] + y[i]*y[i] + z[i]*z[i]);
         }
+
+
+        return true;
     }
 
 
-    void SmoothArrayStream(const float * input,
+    bool SmoothArrayStream(const float * input,
                            const int     size,
                            float       * output,
                            const float   weight) {
+
+        // Sanity check
+        if (size<1)
+          return false;
+
+        // Sanity check
+        if (input==NULL || output==NULL)
+          return false;
+
+        // Sanity check
+        if (weight<0.f || weight>1.f)
+          return false;
         
         // Parameters
         const float alpha = weight;
@@ -65,13 +90,27 @@ namespace imua
         for (int i=size-2; i>=0; --i) {
             output[i] = alpha * output[i] + beta * output[i+1];
         }
+
+        return true;
     }
     
     
-    void SmoothArrayBoxFilter(const float * input,
+    bool SmoothArrayBoxFilter(const float * input,
                               const int     size,
                               float       * output,
                               const float   sigma) {
+
+        // Sanity check
+        if (size<1)
+          return false;
+
+        // Sanity check
+        if (input==NULL || output==NULL)
+          return false;
+
+        // Sanity check
+        if (sigma<=0.f)
+          return false;
         
         try {
 
@@ -90,7 +129,10 @@ namespace imua
         }
         catch (...) {
           std::cerr << "Exception caught in SmoothArrayBoxFilter" << std::endl;
-        } 
+          return false;
+        }
+
+        return true;
     }
 
 
