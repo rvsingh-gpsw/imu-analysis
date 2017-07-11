@@ -221,6 +221,14 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> jumps;
     imua::generic::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+
+    std::vector<imua::Detection> shaky;
+    imua::generic::detectShakiness(imu, shaky);
+    std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
+
+    std::vector<imua::Detection> pans;
+    imua::generic::detectPans(imu, pans);
+    std::copy(pans.begin(), pans.end(), back_inserter(detections));
   }
   else if (vertical=="surfing")
   {
@@ -289,6 +297,14 @@ int main(int argc, char *argv[])
     std::vector<imua::Detection> jumps;
     imua::generic::detectJumps(imu, jumps);
     std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+
+    // std::vector<imua::Detection> shaky;
+    // imua::generic::detectShakiness(imu, shaky);
+    // std::copy(shaky.begin(), shaky.end(), back_inserter(detections));
+
+    // std::vector<imua::Detection> pans;
+    // imua::generic::detectPans(imu, pans);
+    // std::copy(pans.begin(), pans.end(), back_inserter(detections));
   }
   else
   {
