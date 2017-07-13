@@ -79,7 +79,7 @@ namespace imua
 
             // Add a detection 
             if (val<=threshold_norm_min && end-start>=threshold_dur_min) {
-              detections.push_back(Detection(start, end, val, "jump2"));
+              detections.push_back(Detection(start, end, val, "jump"));
             }
 
             // The detection is finished
@@ -89,7 +89,7 @@ namespace imua
 
         // Handle if we still have a potential detection in progress
         if (dip && val<=threshold_norm_min && end-start>=threshold_dur_min) {
-          detections.push_back(Detection(start, end, val, "jump2"));
+          detections.push_back(Detection(start, end, val, "jump"));
         }
 
         // If no jumps has been detected, no need to filter them
@@ -114,183 +114,193 @@ namespace imua
     }
 
 
-    void detectShakiness(const IMU & imu,
+    bool detectShakiness(const IMU              & imu,
                          std::vector<Detection> & detections,
-                         const float thresholdLow,
-                         const float thresholdHigh)
+                         const float              thresholdLow,
+                         const float              thresholdHigh)
     {
       // Sanity check
       if (imu.gyro.size<=0 || imu.gyro.samplingRate<1.f) {
-        return;
+          return false;
       }
 
       // Constants
       const int   size           = imu.gyro.size;
-      const float chunk_duration = 1.f; // seconds
-      const int   chunk_size     = static_cast<int>(imu.gyro.samplingRate * chunk_duration);
-      const int   chunk_nb       = std::ceil(static_cast<float>(size) / chunk_size);
+      const float window_duration = 1.f; // seconds
+      const int   window_size     = static_cast<int>(imu.gyro.samplingRate * window_duration);
+      const int   window_nb       = std::ceil(static_cast<float>(size) / window_size);
 
       // Sanity check
-      if (chunk_size<1 || chunk_nb<1) {
-        return;
+      if (window_size<1 || window_nb<1) {
+          return false;
       }
 
-      // Compute low frequencies
-      std::vector<float> x_lf(size);
-      std::vector<float> y_lf(size);
-      std::vector<float> z_lf(size);
-      SmoothArrayStream(imu.gyro.x, size, &x_lf[0], 0.02f);
-      SmoothArrayStream(imu.gyro.y, size, &y_lf[0], 0.02f);
-      SmoothArrayStream(imu.gyro.z, size, &z_lf[0], 0.02f);
+      // This part allocate memory and may throw an exception. Let's protect it with a try-catch.
+      try {
 
-      // Compute high frequencies
-      std::vector<float> x_hf(size);
-      std::vector<float> y_hf(size);
-      std::vector<float> z_hf(size);
-      for (int i=0; i<size; ++i)
-      {
-        x_hf[i] = imu.gyro.x[i] - x_lf[i];
-        y_hf[i] = imu.gyro.y[i] - y_lf[i];
-        z_hf[i] = imu.gyro.z[i] - z_lf[i];
-      }
+          // Compute low frequencies
+          std::vector<float> x_lf(size);
+          std::vector<float> y_lf(size);
+          std::vector<float> z_lf(size);
+          SmoothArrayStream(imu.gyro.x, size, &x_lf[0], 0.02f);
+          SmoothArrayStream(imu.gyro.y, size, &y_lf[0], 0.02f);
+          SmoothArrayStream(imu.gyro.z, size, &z_lf[0], 0.02f);
 
-      // Compute the shakiness value for each chunk
-      std::vector<int>   chunk_value(chunk_nb);
-      std::vector<float> chunk_start(chunk_nb);
-      std::vector<float> chunk_end(chunk_nb);
-      for (int i=0; i<chunk_nb; ++i)
-      {
-
-        // Index where the chunk starts and ends
-        const int start = i * chunk_size;
-        const int end   = std::min(start+chunk_size-1, size-1);
-
-        // Compute the variances
-        float var_x  = 0;
-        float var_y  = 0;
-        float var_z  = 0;
-        int   count  = 0;
-        for (int j=start; j<=end; ++j) {
-          var_x  += x_hf[j] * x_hf[j];
-          var_y  += y_hf[j] * y_hf[j];
-          var_z  += z_hf[j] * z_hf[j];
-          count++;
-        }
-        var_x /= count;
-        var_y /= count;
-        var_z /= count;
-
-        // Compute the norm of the standard deviation
-        const float norm = std::sqrt(var_x + var_y + var_z);
-
-        // Deduce the chunk value
-        if (norm<=thresholdLow)
-          chunk_value[i] = 0;
-        else if (norm<=thresholdHigh)
-          chunk_value[i] = 1;
-        else
-          chunk_value[i] = 2;
-
-        // Set when the chunk starts and ends
-        chunk_start[i] = imu.gyro.t[start];
-        chunk_end[i]   = imu.gyro.t[end];
-      }
-
-      // Now deduce detections
-      int previous_val = 0;
-      for (int i=0; i<chunk_nb; ++i)
-      {
-        // If the shakiness mode is the same as before, we update the detection's end
-        const int current_val = chunk_value[i];
-        if (current_val==previous_val) {
-          if (current_val>0) {
-            detections.back().end = chunk_end[i];
+          // Compute high frequencies
+          std::vector<float> x_hf(size);
+          std::vector<float> y_hf(size);
+          std::vector<float> z_hf(size);
+          for (int i=0; i<size; ++i) {
+              x_hf[i] = imu.gyro.x[i] - x_lf[i];
+              y_hf[i] = imu.gyro.y[i] - y_lf[i];
+              z_hf[i] = imu.gyro.z[i] - z_lf[i];
           }
-        }
-        // We change the mode of detection
-        else {
-          if (current_val==1) {
-            Detection detection(chunk_start[i], chunk_end[i], 1., "shaky medium");
-            detections.push_back(detection);
-          }
-          else if (current_val==2) {
-            Detection detection(chunk_start[i], chunk_end[i], 2., "shaky strong");
-            detections.push_back(detection);
-          }
-        }
 
-        // Update the previous detection for next chunk
-        previous_val = current_val;
+          // Compute the shakiness value for each window
+          std::vector<int>   window_value(window_nb);
+          std::vector<float> window_start(window_nb);
+          std::vector<float> window_end(window_nb);
+          for (int i=0; i<window_nb; ++i) {
+
+              // Index where the chunk starts and ends
+              const int start = i * window_size;
+              const int end   = std::min(start+window_size-1, size-1);
+
+              // Compute the variances
+              float var_x  = 0;
+              float var_y  = 0;
+              float var_z  = 0;
+              int   count  = 0;
+              for (int j=start; j<=end; ++j) {
+                  var_x  += x_hf[j] * x_hf[j];
+                  var_y  += y_hf[j] * y_hf[j];
+                  var_z  += z_hf[j] * z_hf[j];
+                  count++;
+              }
+              var_x /= count;
+              var_y /= count;
+              var_z /= count;
+
+              // Compute the norm of the standard deviation
+              const float norm = std::sqrt(var_x + var_y + var_z);
+
+              // Deduce the chunk value
+              if (norm<=thresholdLow)
+                  window_value[i] = 0; // Not shaky
+              else if (norm<=thresholdHigh)
+                  window_value[i] = 1; // Shaky medium
+              else
+                  window_value[i] = 2; // Shaky strong
+
+              // Set when the chunk starts and ends
+              window_start[i] = imu.gyro.t[start];
+              window_end[i]   = imu.gyro.t[end];
+          }
+
+          // Now deduce detections
+          int previous_val = 0;
+          for (int i=0; i<window_nb; ++i)
+          {
+              // If the shakiness mode is the same as before, we update the detection's end
+              const int current_val = window_value[i];
+              if (current_val==previous_val) {
+                  if (current_val>0) {
+                      detections.back().end = window_end[i];
+                  }
+              }
+              // We change the mode of detection
+              else {
+                  if (current_val==1) {
+                      Detection detection(window_start[i], window_end[i], 1., "shaky medium");
+                      detections.push_back(detection);
+                  }
+                  else if (current_val==2) {
+                      Detection detection(window_start[i], window_end[i], 2., "shaky strong");
+                      detections.push_back(detection);
+                  }
+              }
+
+              // Update the previous detection for next chunk
+              previous_val = current_val;
+          }
+
       }
+      catch (...) {
+        std::cerr << "Exception caught in jump detector" << std::endl;
+        return false;
+      } 
+
+      return true;
     }
 
 
-    void detectPans(const IMU & imu,
+    bool detectPans(const IMU & imu,
                     std::vector<Detection> & pans)
     {
 
-      // Parameters
-      const float Z_MIN        = 0.4f;
-      const float Z_MAX        = 1.f;
-      const float XY_MAX       = 0.2f;
-      const float DURATION_MIN = 2.f;
+        // Parameters
+        const float Z_MIN        = 0.4f;
+        const float Z_MAX        = 1.f;
+        const float XY_MAX       = 0.2f;
+        const float DURATION_MIN = 2.f;
 
-      // To make code lighter
-      const float * x = imu.gyro.x;
-      const float * y = imu.gyro.y;
-      const float * z = imu.gyro.z;
-      const float * t = imu.gyro.t;
+        // To make code lighter
+        const float * x = imu.gyro.x;
+        const float * y = imu.gyro.y;
+        const float * z = imu.gyro.z;
+        const float * t = imu.gyro.t;
 
-      // Variable for the detections
-      enum DetectionType {none, left, right};
-      DetectionType previous = none;
-      float         start    = 0.f;
-      float         end      = 0.f;
+        // Variable for the detections
+        enum DetectionType {none, left, right};
+        DetectionType previous = none;
+        float         start    = 0.f;
+        float         end      = 0.f;
 
-      // Go through all gyroscopic values
-      for (int i=0; i<imu.gyro.size; ++i) {
+        // Go through all gyroscopic values
+        for (int i=0; i<imu.gyro.size; ++i) {
 
-        // Get the type of pan
-        const bool is_left_pan  = z[i]>=Z_MIN  && z[i]<=Z_MAX;
-        const bool is_right_pan = z[i]<=-Z_MIN && z[i]>=-Z_MAX;
-        const bool is_not_noisy = std::max(std::abs(x[i]), std::abs(y[i])) <= XY_MAX;
-        DetectionType current = none;
-        if (is_left_pan && is_not_noisy)
-          current = left;
-        else if (is_right_pan && is_not_noisy)
-          current = right;
+            // Get the type of pan
+            const bool is_left_pan  = z[i]>=Z_MIN  && z[i]<=Z_MAX;
+            const bool is_right_pan = z[i]<=-Z_MIN && z[i]>=-Z_MAX;
+            const bool is_not_noisy = std::max(std::abs(x[i]), std::abs(y[i])) <= XY_MAX;
+            DetectionType current = none;
+            if (is_left_pan && is_not_noisy)
+                current = left;
+            else if (is_right_pan && is_not_noisy)
+                current = right;
 
-        // We change the type of pan
-        if (current!=previous) {
+            // We change the type of pan
+            if (current!=previous) {
 
-          // Write the previous pan if necessary
-          if (previous!=none && end-start>=DURATION_MIN) {
-            const std::string description = (previous==left) ? "pan left" : "pan right";
-            const float       value       = (previous==left) ? 1 : 2;
-            pans.push_back(Detection(start, end, value, description));
-          }
+                // Write the previous pan if necessary
+                if (previous!=none && end-start>=DURATION_MIN) {
+                    const std::string description = (previous==left) ? "pan left" : "pan right";
+                    const float       value       = (previous==left) ? 1 : 2;
+                    pans.push_back(Detection(start, end, value, description));
+                }
 
-          // Create a new type of pan
-          if (current!=none) {
-            start = t[i];
-            end   = t[i];
-          }
+                // Create a new type of pan
+                if (current!=none) {
+                    start = t[i];
+                    end   = t[i];
+                }
+            }
+            // The previous pan continues, we need to update its ending (eventually)
+            else if (current!=none) {
+                end = t[i];
+            }
+
+            // Udate the type of the previous pan
+            previous = current;
         }
-        // The previous pan continues, we need to update its ending (eventually)
-        else if (current!=none) {
-          end = t[i];
+
+        // Write the current pan if needed
+        if (previous!=none && end-start>=DURATION_MIN) {
+          const std::string description = (previous==left) ? "pan left" : "pan right";
+          const float       value       = (previous==left) ? 1 : 2;
+          pans.push_back(Detection(start, end, value, description));
         }
-
-        // Udate the type of the previous pan
-        previous = current;
-      }
-
-      // Write the current pan if needed
-      if (previous!=none && end-start>=DURATION_MIN) {
-        const std::string description = (previous==left) ? "pan left" : "pan right";
-        const float       value       = (previous==left) ? 1 : 2;
-        pans.push_back(Detection(start, end, value, description));
-      }
+        return true;
 
     }
 

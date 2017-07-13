@@ -11,9 +11,9 @@ namespace imua
     /**
      * Detect jumps.
      * @param imu                 IMU structure
-     * @param detections          Output array that will contain detections
-     * @param thresholdNorm       Acceleration (in m/s^2) value under which a jump is detected
-     * @param hangetimeThreshold  Minimum duration of a jump
+     * @param detections          output array that will contain detections
+     * @param thresholdNorm       acceleration (in m/s^2) value under which a jump is detected
+     * @param hangetimeThreshold  minimum duration of a jump
      * @return true is everything went fine, false otherwise
      */
     bool detectJumps(const IMU              & imu,
@@ -34,11 +34,12 @@ namespace imua
      * @param detections     output array that will contain detections
      * @param thresholdLow   low threshold
      * @param thresholdHigh  high threshold
+     * @return true is everything went fine, false otherwise
      */
-    void detectShakiness(const IMU & imu,
+    bool detectShakiness(const IMU              & imu,
                          std::vector<Detection> & detections,
-                         const float thresholdLow=0.5f,
-                         const float thresholdHigh=1.f);
+                         const float              thresholdLow = 0.5f,
+                         const float              thresholdHigh = 1.f);
 
     /**
      * Detect camera pans. We only detect left and right pan.
@@ -47,9 +48,10 @@ namespace imua
      *   value = 2 -> right pan
      * @param imu   IMU structure
      * @param pans  output array that will contain detections
+     * @return true is everything went fine, false otherwise
      */
-    void detectPans(const IMU & imu,
-                    std::vector<Detection> & pans);
+    bool detectPans(const IMU & imu,
+                     std::vector<Detection> & pans);
 
     /**
      *
