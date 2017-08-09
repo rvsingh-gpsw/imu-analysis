@@ -106,9 +106,10 @@ void exportSubtitles(const std::string & path, const std::string & vertical, con
           srtFile << std::fixed;
           srtFile << "<font color=\"#00FF00\">";
           srtFile << detections[i].description;
-          srtFile << " t= " << std::setprecision(2) << detections[i].end-detections[i].start << " s ";
-          srtFile << " g= " << std::setprecision(2) << detections[i].value;
-          srtFile << " r= " << (detections[i].end-detections[i].start) / detections[i].value;
+          srtFile << " (" << std::setprecision(2) << detections[i].end-detections[i].start << " s)";
+          // srtFile << " t= " << std::setprecision(2) << detections[i].end-detections[i].start << " s ";
+          // srtFile << " g= " << std::setprecision(2) << detections[i].value;
+          // srtFile << " r= " << (detections[i].end-detections[i].start) / detections[i].value;
           srtFile << "</font>" << std::endl;
           srtFile << std::endl;
       }
@@ -294,9 +295,9 @@ int main(int argc, char *argv[])
   }
   else if (vertical=="vincent")
   {
-    std::vector<imua::Detection> jumps;
-    imua::generic::detectJumps(imu, jumps);
-    std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
+    // std::vector<imua::Detection> jumps;
+    // imua::generic::detectJumps(imu, jumps);
+    // std::copy(jumps.begin(), jumps.end(), back_inserter(detections));
 
     // std::vector<imua::Detection> shaky;
     // imua::generic::detectShakiness(imu, shaky);
@@ -305,6 +306,10 @@ int main(int argc, char *argv[])
     // std::vector<imua::Detection> pans;
     // imua::generic::detectPans(imu, pans);
     // std::copy(pans.begin(), pans.end(), back_inserter(detections));
+
+    std::vector<imua::Detection> fixedShots;
+    imua::generic::detectFixedShots(imu, fixedShots);
+    std::copy(fixedShots.begin(), fixedShots.end(), back_inserter(detections));
   }
   else
   {

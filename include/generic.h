@@ -51,7 +51,16 @@ namespace imua
      * @return true is everything went fine, false otherwise
      */
     bool detectPans(const IMU & imu,
-                     std::vector<Detection> & pans);
+                    std::vector<Detection> & pans);
+
+    /**
+     * Detect fixed shots. 
+     * @param imu         IMU structure
+     * @param fixedShots  output array that will contain detections
+     * @return true is everything went fine, false otherwise
+     */
+    bool detectFixedShots(const IMU & imu,
+                          std::vector<Detection> & fixedShots);
 
     /**
      *

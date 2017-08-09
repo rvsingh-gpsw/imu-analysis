@@ -306,6 +306,124 @@ namespace imua
 
 
 
+    bool detectFixedShots(const IMU & imu,
+                          std::vector<Detection> & fixedShots) {
+
+        // Sanity check
+        if (imu.gyro.size<=0 || imu.gyro.samplingRate<1.f) {
+            return false;
+        }
+
+        // Parameters
+        const float threshold    = 0.00005f;
+        const float min_duration = 2.f;
+
+        // Constants
+        const int   size     = imu.gyro.size;
+        const float win_dur  = 0.1f; // seconds
+        const int   win_size = static_cast<int>(imu.gyro.samplingRate * win_dur);
+        const int   win_nb   = std::ceil(static_cast<float>(size) / win_size);
+
+        // Sanity check
+        if (win_size<1 || win_nb<1) {
+            return false;
+        }
+
+        // To make code lighter
+        const float * x = imu.gyro.x;
+        const float * y = imu.gyro.y;
+        const float * z = imu.gyro.z;
+        const float * t = imu.gyro.t;
+
+        // This part allocate memory and may throw an exception. Let's protect it with a try-catch.
+        try {
+
+            // Compute if each window is a fixed shot
+            std::vector<bool>  win_value(win_nb);
+            std::vector<float> win_start(win_nb);
+            std::vector<float> win_end(win_nb);
+            for (int i=0; i<win_nb; ++i) {
+
+                // Index where the chunk starts and ends
+                const int idx_start = i * win_size;
+                const int idx_end   = std::min(idx_start+win_size-1, size-1);
+
+                // Compute the mean values
+                double sum_x = 0.;
+                double sum_y = 0.;
+                double sum_z = 0.;
+                for (int j=idx_start; j<=idx_end; ++j) {
+                    sum_x += x[j];
+                    sum_y += y[j];
+                    sum_z += z[j];
+                }
+                const int    count  = idx_end-idx_start+1;
+                const double mean_x = sum_x / count;
+                const double mean_y = sum_y / count;
+                const double mean_z = sum_z / count;
+
+                // Compute the unbiaised variance values
+                sum_x = 0.;
+                sum_y = 0.;
+                sum_z = 0.;
+                for (int j=idx_start; j<=idx_end; ++j) {
+                    sum_x += (x[j]-mean_x) * (x[j]-mean_x);
+                    sum_y += (y[j]-mean_y) * (y[j]-mean_y);
+                    sum_z += (z[j]-mean_z) * (z[j]-mean_z);
+                }
+                const double var_x = sum_x / (count-1.);
+                const double var_y = sum_y / (count-1.);
+                const double var_z = sum_z / (count-1.);
+
+                // Set window's values
+                win_value[i] = (var_x<=threshold && var_y<=threshold && var_z<=threshold) ? true : false;
+                win_start[i] = imu.gyro.t[idx_start];
+                win_end[i]   = imu.gyro.t[idx_end];
+            }
+
+            // Deduce detections
+            bool  dip   = false; // Detection in progress
+            float start = 0.f;
+            float end   = 0.f;
+            for (int i=0; i<win_nb; ++i)
+            {
+                // We have detection: create a new one or update the previous one
+                if (win_value[i]) {
+                    if (!dip) {
+                        start = win_start[i];
+                    }
+                    end = win_end[i];
+                    dip = true;
+                }
+                // Handle a previous detection
+                else if (dip) {
+
+                    // Add a detection if it's long enough
+                    if (end-start>=min_duration) {
+                        fixedShots.push_back(Detection(start, end, 1., "fixed shot"));
+                    }
+
+                    // No detection are in progress
+                    dip = false;
+                }
+            }
+
+            // Handle if we still have a potential detection in progress 
+            if (dip && end-start>=min_duration) {
+                fixedShots.push_back(Detection(start, end, 1., "fixed shot"));
+            }
+        }
+        catch (...) {
+          std::cerr << "Exception caught in fixed shots detector" << std::endl;
+          return false;
+        } 
+
+        return true;
+    }
+
+
+
+
     //----------------------------------------------------------------------------------------------
     void detectFlips(const IMU & imu,
                      const Euler & euler,
