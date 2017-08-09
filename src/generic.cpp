@@ -92,18 +92,6 @@ namespace imua
           detections.push_back(Detection(start, end, val, "jump"));
         }
 
-        // If no jumps has been detected, no need to filter them
-        if (detections.empty())
-          return true;
-
-        // Find the minimum norm value and the maximum duration
-        float min_val = 100.f;
-        float max_dur = 0.f;
-        for (int i=0; i<detections.size(); ++i) {
-          min_val = std::min(min_val, detections[i].value);
-          max_dur = std::max(max_dur, detections[i].end-detections[i].start);
-        }
-
       }
       catch (...) {
         std::cerr << "Exception caught in jump detector" << std::endl;
