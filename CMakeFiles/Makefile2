@@ -113,6 +113,15 @@ CMakeFiles/IMUAnalysisShared.dir/rule: cmake_check_build_system
 IMUAnalysisShared: CMakeFiles/IMUAnalysisShared.dir/rule
 .PHONY : IMUAnalysisShared
 
+# Pre-install relink rule for target.
+CMakeFiles/IMUAnalysisShared.dir/preinstall:
+	$(MAKE) -f CMakeFiles/IMUAnalysisShared.dir/build.make CMakeFiles/IMUAnalysisShared.dir/preinstall
+.PHONY : CMakeFiles/IMUAnalysisShared.dir/preinstall
+
+# Prepare target for install.
+preinstall: CMakeFiles/IMUAnalysisShared.dir/preinstall
+.PHONY : preinstall
+
 # clean rule for target.
 CMakeFiles/IMUAnalysisShared.dir/clean:
 	$(MAKE) -f CMakeFiles/IMUAnalysisShared.dir/build.make CMakeFiles/IMUAnalysisShared.dir/clean

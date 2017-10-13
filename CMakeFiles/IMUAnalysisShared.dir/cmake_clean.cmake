@@ -9,6 +9,8 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/IMUAnalysisShared.dir/src/surfing.cpp.o"
   "libIMUAnalysis.pdb"
   "libIMUAnalysis.so"
+  "libIMUAnalysis.pdb"
+  "CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so"
 )
 
 # Per-language clean rules from dependency scanning.

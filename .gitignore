@@ -1,4 +1,5 @@
 /build
 bindings/cython/build
+CMakeCache.txt
 *.a
 *.so

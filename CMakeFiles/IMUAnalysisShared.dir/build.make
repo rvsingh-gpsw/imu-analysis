@@ -265,6 +265,38 @@ libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/link.txt
 CMakeFiles/IMUAnalysisShared.dir/build: libIMUAnalysis.so
 .PHONY : CMakeFiles/IMUAnalysisShared.dir/build
 
+# Object files for target IMUAnalysisShared
+IMUAnalysisShared_OBJECTS = \
+"CMakeFiles/IMUAnalysisShared.dir/src/types.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/tools.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/gp5imu_Madgwick.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/generic.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/snowboarding.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/skateboarding.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/mountainbiking.cpp.o" \
+"CMakeFiles/IMUAnalysisShared.dir/src/surfing.cpp.o"
+
+# External object files for target IMUAnalysisShared
+IMUAnalysisShared_EXTERNAL_OBJECTS =
+
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/types.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/tools.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/gp5imu_Madgwick.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/generic.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/snowboarding.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/skateboarding.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/mountainbiking.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/src/surfing.cpp.o
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/build.make
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: gpmf/libgpmf_parser.so
+CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so: CMakeFiles/IMUAnalysisShared.dir/relink.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX shared library CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so"
+	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/IMUAnalysisShared.dir/relink.txt --verbose=$(VERBOSE)
+
+# Rule to relink during preinstall.
+CMakeFiles/IMUAnalysisShared.dir/preinstall: CMakeFiles/CMakeRelink.dir/libIMUAnalysis.so
+.PHONY : CMakeFiles/IMUAnalysisShared.dir/preinstall
+
 CMakeFiles/IMUAnalysisShared.dir/requires: CMakeFiles/IMUAnalysisShared.dir/src/types.cpp.o.requires
 CMakeFiles/IMUAnalysisShared.dir/requires: CMakeFiles/IMUAnalysisShared.dir/src/tools.cpp.o.requires
 CMakeFiles/IMUAnalysisShared.dir/requires: CMakeFiles/IMUAnalysisShared.dir/src/gp5imu_Madgwick.cpp.o.requires
