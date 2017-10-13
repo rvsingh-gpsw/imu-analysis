@@ -1,1 +1,4 @@
 /build
+bindings/cython/build
+*.a
+*.so

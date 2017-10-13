@@ -1,0 +1,2 @@
+/usr/bin/ar cr libIMUAnalysis.a  CMakeFiles/IMUAnalysis.dir/src/types.cpp.o CMakeFiles/IMUAnalysis.dir/src/tools.cpp.o CMakeFiles/IMUAnalysis.dir/src/gp5imu_Madgwick.cpp.o CMakeFiles/IMUAnalysis.dir/src/generic.cpp.o CMakeFiles/IMUAnalysis.dir/src/snowboarding.cpp.o CMakeFiles/IMUAnalysis.dir/src/skateboarding.cpp.o CMakeFiles/IMUAnalysis.dir/src/mountainbiking.cpp.o CMakeFiles/IMUAnalysis.dir/src/surfing.cpp.o
+/usr/bin/ranlib libIMUAnalysis.a

@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/gpmf_metadata.h
+
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/gpmf_parser.cpp
+math.h
+-
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+stdint.h
+-
+gpmf_parser.h
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/gpmf_parser.h
+gpmf_metadata.h
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/gpmf_metadata.h
+
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/gpmf_parser.h
+

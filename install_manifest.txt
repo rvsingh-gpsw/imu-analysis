@@ -1,0 +1,10 @@
+/usr/local/lib/libIMUAnalysis.a
+/usr/local/lib/libIMUAnalysis.so
+/usr/local/include/IMUAnalysis/types.h
+/usr/local/include/IMUAnalysis/gp5imu_Madgwick.h
+/usr/local/include/IMUAnalysis/generic.h
+/usr/local/include/IMUAnalysis/snowboarding.h
+/usr/local/include/IMUAnalysis/skateboarding.h
+/usr/local/include/IMUAnalysis/mountainbiking.h
+/usr/local/include/IMUAnalysis/surfing.h
+/usr/local/lib/libgpmf_parser.so

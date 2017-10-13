@@ -1,0 +1,3 @@
+/home/ubuntu/temp/gopro-lib-imu-analysis/CMakeFiles/IMUAnalysis.dir
+/home/ubuntu/temp/gopro-lib-imu-analysis/CMakeFiles/IMUAnalysisShared.dir
+/home/ubuntu/temp/gopro-lib-imu-analysis/gpmf/CMakeFiles/gpmf_parser.dir
